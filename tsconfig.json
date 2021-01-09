@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+	  "target": "esnext",
+	  "module": "commonjs",
+	  "lib": ["esnext"],
+	  "moduleResolution": "node",
+	  "outDir": "dist",
+	  "strict": true,
+	  "noUnusedLocals": true,
+	  "noUnusedParameters": true,
+	  "sourceMap": false,
+	},
+	"include": ["./src"]
+}

@@ -1,0 +1,53 @@
+{
+	"name": "vite-plugin-singlefile",
+	"version": "0.1.0",
+	"description": "Vite plugin for inlining JavaScript and CSS resources",
+	"main": "dist/index.js",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"dev": "rimraf dist && tsc -w --p tsconfig.json",
+		"build": "rimraf dist && tsc -p tsconfig.json",
+		"prepublishOnly": "npm build"
+	},
+	"keywords": [
+		"vite",
+		"inline",
+		"css",
+		"SFA",
+		"single-file"
+	],
+	"author": "richard@tallent.us",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/richardtallent/vite-plugin-singlefile"
+	},
+	"bugs": {
+		"url": "https://github.com/richardtallent/vite-plugin-singlefile/issues"
+	},
+	"homepage": "https://github.com/richardtallent/vite-plugin-singlefile/tree/main/#readme",
+	"dependencies": {
+		"@rollup/plugin-node-resolve": "^11.0.1",
+		"esbuild": "^0.8.29",
+		"rollup": "^2.35.1",
+		"rollup-plugin-esbuild": "^2.6.1"
+	},
+	"peerDependencies": {
+		"vite": ">=2.0.0-beta.3"
+	},
+	"devDependencies": {
+		"rimraf": "^3.0.2",
+		"typescript": "^4.0.3",
+		"vite": "^2.0.0-beta.3"
+	},
+	"prettier": {
+		"useTabs": true,
+		"semi": false,
+		"singleQuote": false,
+		"bracketSpacing": true,
+		"trailingComma": "es5",
+		"printWidth": 180
+	}
+}
