@@ -37,7 +37,6 @@ export default defineConfig({
 
 ### Caveats
 
-- As of the time of publication, Vite (2.0.0-beta.12 - 2.0.0-beta.15) does not include a link to the CSS file when `cssCodeSplit` is set to `false`. This has been reported as a bug, and this plugin will work around that issue.
 - Currently, `favicon` resources are not inlined by Vite, and this plugin doesn't do that either.
 - There may be other situations where referenced files aren't inlined by Vite and aren't caught by this plugin either. I've done very little testing so far, I just wanted to get this out there first.
 - This is my first Vite and first Rollup plugin. I have no idea what I'm doing. PRs welcome.

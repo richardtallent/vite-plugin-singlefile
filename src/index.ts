@@ -12,22 +12,17 @@ export function viteSingleFile(): Plugin {
 				if (!ctx?.bundle) return html
 				// Get the bundle
 				let extraCode = ""
-				for (const [key, value] of Object.entries(ctx.bundle)) {
-					console.log(`KEY: ${key} (${value.fileName}):`)
+				for (const [, value] of Object.entries(ctx.bundle)) {
 					const o = value as OutputChunk
 					const a = value as OutputAsset
 					if (o.code) {
-						html = html.replace(`<script type="module" src="/${value.fileName}"></script>`, `<script type="module">\n//${o.fileName}\n${o.code}\n</script>`)
+						const reScript = new RegExp(`<script type="module"[^>]*?src="/${value.fileName}"[^>]*?></script>`)
+						const code = `<script type="module">\n//${o.fileName}\n${o.code}\n</script>`
+						html = html.replace(reScript, (_) => code)
 					} else if (value.fileName.endsWith(".css")) {
-						const css = `<!-- ${a.fileName} --><style type="text/css">\n${a.source}\n</style>`
-						const lookFor = `<link rel="stylesheet" src="/${value.fileName}" />`
-						if (html.includes(lookFor)) {
-							html = html.replace(lookFor, css)
-						} else {
-							// Vite 2.0 beta 12-15 issue, no link to replace
-							// https://github.com/vitejs/vite/issues/1141
-							extraCode += css
-						}
+						const reCSS = new RegExp(`<link rel="stylesheet"[^>]*?href="/${value.fileName}"[^>]*?>`)
+						const code = `<!-- ${a.fileName} --><style type="text/css">\n${a.source}\n</style>`
+						html = html.replace(reCSS, (_) => code)
 					} else {
 						extraCode += "\n<!-- ASSET NOT INLINED: " + a.fileName + " -->\n"
 					}
