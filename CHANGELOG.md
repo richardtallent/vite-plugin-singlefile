@@ -6,3 +6,4 @@
 | 2021-01-14 | 0.2.0   | Fix for newest Vite beta, including CSS support           |
 | 2021-01-14 | 0.3.0   | Borked npm update                                         |
 | 2021-01-14 | 0.4.0   | Work around regex accidental replacement variables issue. |
+| 2021-01-21 | 0.5.0   | Add TypeScript declaration file (originally 0.1.1 with the wrong base, forgot to push 0.2-0.4) |

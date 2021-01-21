@@ -1,14 +1,18 @@
 {
 	"compilerOptions": {
-	  "target": "esnext",
-	  "module": "commonjs",
-	  "lib": ["esnext"],
-	  "moduleResolution": "node",
-	  "outDir": "dist",
-	  "strict": true,
-	  "noUnusedLocals": true,
-	  "noUnusedParameters": true,
-	  "sourceMap": false,
+		"target": "esnext",
+		"module": "commonjs",
+		"lib": ["esnext"],
+		"moduleResolution": "node",
+		"outDir": "dist",
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"sourceMap": false,
+		"declaration": true,
+		"declarationDir": "dist",
+		"declarationMap": false
 	},
-	"include": ["./src"]
+	"include": ["./src"],
+	"exclude": ["node_modules"]
 }
