@@ -1,8 +1,9 @@
 {
 	"name": "vite-plugin-singlefile",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Vite plugin for inlining JavaScript and CSS resources",
 	"main": "dist/index.js",
+	"typings": "dist/index.d.ts",
 	"files": [
 		"dist"
 	],
@@ -29,9 +30,9 @@
 	},
 	"homepage": "https://github.com/richardtallent/vite-plugin-singlefile/tree/main/#readme",
 	"dependencies": {
-		"@rollup/plugin-node-resolve": "^11.0.1",
-		"esbuild": "^0.8.29",
-		"rollup": "^2.35.1",
+		"@rollup/plugin-node-resolve": "^11.1.0",
+		"esbuild": "^0.8.33",
+		"rollup": "^2.37.1",
 		"rollup-plugin-esbuild": "^2.6.1"
 	},
 	"peerDependencies": {
@@ -40,7 +41,7 @@
 	"devDependencies": {
 		"rimraf": "^3.0.2",
 		"typescript": "^4.0.3",
-		"vite": "^2.0.0-beta.3"
+		"vite": "^2.0.0-beta.35"
 	},
 	"prettier": {
 		"useTabs": true,
