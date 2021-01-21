@@ -17,7 +17,9 @@ export function viteSingleFile(): Plugin {
 					const o = value as OutputChunk
 					const a = value as OutputAsset
 					if (o.code) {
-						html = html.replace(`<script type="module" src="/${value.fileName}"></script>`, `<script type="module">\n//${o.fileName}\n${o.code}\n</script>`)
+						const filename = value.fileName.replace(/[./]/g, '\\$&')
+						const regex = new RegExp(`<script (.*) src="\\/${filename}"><\\/script>`)
+						html = html.replace(regex, `<script $1>\n//${o.fileName}\n${o.code}\n</script>`);
 					} else if (value.fileName.endsWith(".css")) {
 						const css = `<!-- ${a.fileName} --><style type="text/css">\n${a.source}\n</style>`
 						const lookFor = `<link rel="stylesheet" src="/${value.fileName}" />`
