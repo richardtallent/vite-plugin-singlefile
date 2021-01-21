@@ -22,7 +22,7 @@ export function viteSingleFile(): Plugin {
 						html = html.replace(regex, `<script $1>\n//${o.fileName}\n${o.code}\n</script>`);
 					} else if (value.fileName.endsWith(".css")) {
 						const css = `<!-- ${a.fileName} --><style type="text/css">\n${a.source}\n</style>`
-						const lookFor = `<link rel="stylesheet" src="/${value.fileName}" />`
+						const lookFor = `<link rel="stylesheet" href="/${value.fileName}">`
 						if (html.includes(lookFor)) {
 							html = html.replace(lookFor, css)
 						} else {
