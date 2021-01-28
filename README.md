@@ -21,20 +21,23 @@ Web applications running from a local file have some browser security limitation
 Here's an example `vite.config.ts` file. The `cssCodeSplit` option results in all CSS being emitted as a single file, which `vite-plugin-singlefile` can then inline. The `assetsInlineLimit` ensures that even very large assets are inlined in your JavaScript. The `inlineDynamicImports` also ensures that as many resources as possible are inlined.
 
 ```ts
-import { defineConfig } from "vite"
-import vue from "@vitejs/plugin-vue"
-import { viteSingleFile } from "vite-plugin-singlefile"
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import { viteSingleFile } from "vite-plugin-singlefile";
 
 export default defineConfig({
-	plugins: [vue(), viteSingleFile()],
-	build: {
-		cssCodeSplit: false,
-		assetsInlineLimit: 100000000,
-		rollupOptions: {
-			inlineDynamicImports: true,
-		},
-	},
-})
+  plugins: [vue(), viteSingleFile()],
+  build: {
+    cssCodeSplit: false,
+    assetsInlineLimit: 100000000,
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true,
+        manualChunks: null,
+      },
+    },
+  },
+});
 ```
 
 ### Caveats
