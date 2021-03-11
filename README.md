@@ -31,8 +31,8 @@ export default defineConfig({
 		cssCodeSplit: false,
 		assetsInlineLimit: 100000000,
 		rollupOptions: {
-			inlineDynamicImports: true,
 			outputOptions: {
+				inlineDynamicImports: true,
 				manualChunks: () => "everything.js",
 			},
 		},
