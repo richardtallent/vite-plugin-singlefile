@@ -18,7 +18,7 @@ Web applications running from a local file have some browser security limitation
 
 ## How do I use it?
 
-Here's an example `vite.config.ts` file. The `cssCodeSplit` option results in all CSS being emitted as a single file, which `vite-plugin-singlefile` can then inline. The `assetsInlineLimit` ensures that even very large assets are inlined in your JavaScript. The `inlineDynamicImports` also ensures that as many resources as possible are inlined.
+Here's an example `vite.config.ts` file. The `cssCodeSplit` option results in all CSS being emitted as a single file, which `vite-plugin-singlefile` can then inline. The `assetsInlineLimit` ensures that even very large assets are inlined in your JavaScript. The `inlineDynamicImports` also ensures that as many resources as possible are inlined. The `manualChunks` option became necessary somewhere around Vite 2.0 release to prevent the creation of a separate `vendor.js` bundle.
 
 ```ts
 import { defineConfig } from "vite"
@@ -32,6 +32,9 @@ export default defineConfig({
 		assetsInlineLimit: 100000000,
 		rollupOptions: {
 			inlineDynamicImports: true,
+			outputOptions: {
+				manualChunks: () => "everything.js",
+			},
 		},
 	},
 })
