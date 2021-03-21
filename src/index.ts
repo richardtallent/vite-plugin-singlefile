@@ -9,7 +9,7 @@ export function viteSingleFile(): Plugin {
 			enforce: "post",
 			transform(html: string, ctx?: IndexHtmlTransformContext): IndexHtmlTransformResult {
 				// Only use this plugin during build
-				if (!ctx?.bundle) return html
+				if (!ctx || !ctx.bundle) return html
 				// Get the bundle
 				let extraCode = ""
 				for (const [, value] of Object.entries(ctx.bundle)) {
