@@ -17,7 +17,9 @@ export function viteSingleFile(): Plugin {
 					const a = value as OutputAsset
 					if (o.code) {
 						const reScript = new RegExp(`<script type="module"[^>]*?src="/${value.fileName}"[^>]*?></script>`)
-						const code = `<script type="module">\n//${o.fileName}\n${o.code}\n</script>`
+						const reImport = new RegExp(/import".*?js";/)
+						const reAssetsLoader = new RegExp(/!function.*\("\/assets\/"\);/)
+						const code = `<script type="module">\n//${o.fileName}\n${o.code.replace(reAssetsLoader, '').replace(reImport, '')}\n</script>`
 						html = html.replace(reScript, (_) => code)
 					} else if (value.fileName.endsWith(".css")) {
 						const reCSS = new RegExp(`<link rel="stylesheet"[^>]*?href="/${value.fileName}"[^>]*?>`)
@@ -27,7 +29,8 @@ export function viteSingleFile(): Plugin {
 						extraCode += "\n<!-- ASSET NOT INLINED: " + a.fileName + " -->\n"
 					}
 				}
-				return html.replace(/<\/body>/, extraCode + "</body>")
+				const reModulepreload = new RegExp(/<link rel="modulepreload" href="\/assets\/style\..*.js">/)
+				return html.replace(/<\/body>/, extraCode + "</body>").replace(reModulepreload, '')
 			},
 		},
 	}
