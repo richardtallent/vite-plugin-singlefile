@@ -18,7 +18,7 @@ Web applications running from a local file have some browser security limitation
 
 ## How do I use it?
 
-Here's an example `vite.config.ts` file. The `cssCodeSplit` option results in all CSS being emitted as a single file, which `vite-plugin-singlefile` can then inline. The `assetsInlineLimit` ensures that even very large assets are inlined in your JavaScript. The `inlineDynamicImports` also ensures that as many resources as possible are inlined. The `manualChunks` option became necessary somewhere around Vite 2.0 release to prevent the creation of a separate `vendor.js` bundle.
+Here's an example `vite.config.ts` file.
 
 ```ts
 import { defineConfig } from "vite"
@@ -28,17 +28,28 @@ import { viteSingleFile } from "vite-plugin-singlefile"
 export default defineConfig({
 	plugins: [vue(), viteSingleFile()],
 	build: {
-		cssCodeSplit: false,
+		target: "esnext",
 		assetsInlineLimit: 100000000,
+		chunkSizeWarningLimit: 100000000,
+		cssCodeSplit: false,
+		brotliSize: false,
 		rollupOptions: {
-			outputOptions: {
-				inlineDynamicImports: true,
+			inlineDynamicImports: true,
+			output: {
 				manualChunks: () => "everything.js",
 			},
 		},
 	},
 })
 ```
+
+- The `cssCodeSplit` option results in all CSS being emitted as a single file, which `vite-plugin-singlefile` can then inline.
+- The `assetsInlineLimit` ensures that even very large assets are inlined in your JavaScript.
+- The `inlineDynamicImports` also ensures that as many resources as possible are inlined.
+- The `manualChunks` option became necessary somewhere around Vite 2.0 release to prevent the creation of a separate `vendor.js` bundle. `outputOptions` became just `output` some time after that.
+- The `brotliSize` option just avoids the extra step of testing Brotli compression, which isn't really pertinent to a file served locally.
+- The `chunkSizeWarningLimit` option just avoids the warnings about large chunks.
+- The filename you choose for `manualChunks` ultimately doesn't matter, it will get rolled into `index.html` by the plugin.
 
 ### Caveats
 
