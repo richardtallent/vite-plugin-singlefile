@@ -1,10 +1,28 @@
-import { IndexHtmlTransformResult, IndexHtmlTransformContext } from "vite"
-import { Plugin } from "vite"
+import { IndexHtmlTransformResult, IndexHtmlTransformContext, Plugin, UserConfig, OutputOptions } from "vite"
 import { OutputChunk, OutputAsset } from "rollup"
 
 export function viteSingleFile(): Plugin {
 	return {
 		name: "vite:singlefile",
+		config(config: UserConfig) {
+			if (!config.build) config.build = {}
+			config.build.assetsInlineLimit = 100000000
+			config.build.chunkSizeWarningLimit = 100000000
+			config.build.cssCodeSplit = false
+
+			if (!config.build.rollupOptions) config.build.rollupOptions = {}
+			if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
+
+			if (!Array.isArray(config.build.rollupOptions.output)) {
+				config.build.rollupOptions.output.inlineDynamicImports = true
+				config.build.rollupOptions.output.manualChunks = () => "everything.js"
+			} else {
+				config.build.rollupOptions.output.forEach((out: OutputOptions) => {
+					out.inlineDynamicImports = true
+					out.manualChunks = () => "everything.js"
+				})
+			}
+		},
 		transformIndexHtml: {
 			enforce: "post",
 			transform(html: string, ctx?: IndexHtmlTransformContext): IndexHtmlTransformResult {
