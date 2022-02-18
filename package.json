@@ -1,54 +1,55 @@
 {
-	"name": "vite-plugin-singlefile",
-	"version": "0.6.3",
-	"description": "Vite plugin for inlining JavaScript and CSS resources",
-	"main": "dist/index.js",
-	"typings": "dist/index.d.ts",
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"dev": "rimraf dist && tsc -w --p tsconfig.json",
-		"build": "rimraf dist && tsc -p tsconfig.json",
-		"prepublishOnly": "npm run build"
-	},
-	"keywords": [
-		"vite",
-		"inline",
-		"css",
-		"SFA",
-		"single-file"
-	],
-	"author": "richard@tallent.us",
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/richardtallent/vite-plugin-singlefile"
-	},
-	"bugs": {
-		"url": "https://github.com/richardtallent/vite-plugin-singlefile/issues"
-	},
-	"homepage": "https://github.com/richardtallent/vite-plugin-singlefile/tree/main/#readme",
-	"dependencies": {
-		"@rollup/plugin-node-resolve": "^13.1.2",
-		"esbuild": "^0.14.10",
-		"rollup": "^2.62.0",
-		"rollup-plugin-esbuild": "^4.8.2"
-	},
-	"peerDependencies": {
-		"vite": "^2.7.10"
-	},
-	"devDependencies": {
-		"@types/ws": "^8.2.2",
-		"rimraf": "^3.0.2",
-		"typescript": "^4.5.4"
-	},
-	"prettier": {
-		"useTabs": true,
-		"semi": false,
-		"singleQuote": false,
-		"bracketSpacing": true,
-		"trailingComma": "es5",
-		"printWidth": 180
-	}
+  "name": "vite-plugin-singlefile",
+  "version": "0.6.3",
+  "description": "Vite plugin for inlining JavaScript and CSS resources",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "rimraf dist && tsc -w --p tsconfig.json",
+    "build": "rimraf dist && tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "vite",
+    "inline",
+    "css",
+    "SFA",
+    "single-file"
+  ],
+  "author": "richard@tallent.us",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/richardtallent/vite-plugin-singlefile"
+  },
+  "bugs": {
+    "url": "https://github.com/richardtallent/vite-plugin-singlefile/issues"
+  },
+  "homepage": "https://github.com/richardtallent/vite-plugin-singlefile/tree/main/#readme",
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^13.1.2",
+    "chalk": "^4.1.2",
+    "esbuild": "^0.14.10",
+    "rollup": "^2.62.0",
+    "rollup-plugin-esbuild": "^4.8.2"
+  },
+  "peerDependencies": {
+    "vite": "^2.7.10"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.2.2",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.4"
+  },
+  "prettier": {
+    "useTabs": true,
+    "semi": false,
+    "singleQuote": false,
+    "bracketSpacing": true,
+    "trailingComma": "es5",
+    "printWidth": 180
+  }
 }

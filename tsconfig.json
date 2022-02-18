@@ -1,18 +1,19 @@
 {
-	"compilerOptions": {
-		"target": "esnext",
-		"module": "commonjs",
-		"lib": ["esnext"],
-		"moduleResolution": "node",
-		"outDir": "dist",
-		"strict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"sourceMap": false,
-		"declaration": true,
-		"declarationDir": "dist",
-		"declarationMap": false
-	},
-	"include": ["./src"],
-	"exclude": ["node_modules"]
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "lib": ["esnext"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": false,
+    "declaration": true,
+    "declarationDir": "dist",
+    "declarationMap": false
+  },
+  "include": ["./src"],
+  "exclude": ["node_modules"]
 }
