@@ -17,11 +17,11 @@ export function viteSingleFile(): Plugin {
 					const o = value as OutputChunk
 					const a = value as OutputAsset
 					if (o.code) {
-						const reScript = new RegExp(`<script type="module"[^>]*?src="[\./]*${value.fileName}"[^>]*?></script>`)
+						const reScript = new RegExp(`<script type="module"[^>]*?src="[\./]*${o.fileName}"[^>]*?></script>`)
 						const code = `<script type="module">\n//${o.fileName}\n${o.code}\n</script>`
 						html = html.replace(reScript, (_) => code)
-					} else if (value.fileName.endsWith(".css")) {
-						const reCSS = new RegExp(`<link rel="stylesheet"[^>]*?href="[\./]*${value.fileName}"[^>]*?>`)
+					} else if (a.fileName.endsWith(".css")) {
+						const reCSS = new RegExp(`<link rel="stylesheet"[^>]*?href="[\./]*${a.fileName}"[^>]*?>`)
 						const code = `<style type="text/css">\n${a.source}\n</style>`
 						html = html.replace(reCSS, (_) => code)
 					} else {

@@ -11,3 +11,4 @@
 | 2021-12-12 | 0.6.2   | Update deps. Fix relative asset paths (thanks @prog-rajkamal!). Improved docs.                 |
 | 2021-12-31 | 0.6.3   | Update deps. Fix parent relative asset paths (#17).                                            |
 | 2022-03-01 | 0.7.0   | Update deps. Warn for assets not inlined rather than adding comments (#21, thanks @taybart!)   |
+| 2022-03-02 | 0.7.1   | Downgrade chalk, fixes #22                                                                     |
