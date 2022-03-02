@@ -1,6 +1,7 @@
 import { IndexHtmlTransformResult, IndexHtmlTransformContext } from "vite"
 import { Plugin } from "vite"
 import { OutputChunk, OutputAsset } from "rollup"
+import chalk from "chalk"
 
 export function viteSingleFile(): Plugin {
 	return {
@@ -24,7 +25,7 @@ export function viteSingleFile(): Plugin {
 						const code = `<!-- ${a.fileName} --><style type="text/css">\n${a.source}\n</style>`
 						html = html.replace(reCSS, (_) => code)
 					} else {
-						extraCode += "\n<!-- ASSET NOT INLINED: " + a.fileName + " -->\n"
+						console.warn(`${chalk.yellow("WARN")} asset not inlined: ${chalk.green(a.fileName)}`)
 					}
 				}
 				return html.replace(/<\/body>/, extraCode + "</body>")

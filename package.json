@@ -31,6 +31,7 @@
 	"homepage": "https://github.com/richardtallent/vite-plugin-singlefile/tree/main/#readme",
 	"dependencies": {
 		"@rollup/plugin-node-resolve": "^13.1.2",
+		"chalk": "^4.1.2",
 		"esbuild": "^0.14.10",
 		"rollup": "^2.62.0",
 		"rollup-plugin-esbuild": "^4.8.2"
