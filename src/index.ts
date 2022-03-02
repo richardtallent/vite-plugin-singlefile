@@ -22,7 +22,7 @@ export function viteSingleFile(): Plugin {
 						html = html.replace(reScript, (_) => code)
 					} else if (value.fileName.endsWith(".css")) {
 						const reCSS = new RegExp(`<link rel="stylesheet"[^>]*?href="[\./]*${value.fileName}"[^>]*?>`)
-						const code = `<!-- ${a.fileName} --><style type="text/css">\n${a.source}\n</style>`
+						const code = `<style type="text/css">\n${a.source}\n</style>`
 						html = html.replace(reCSS, (_) => code)
 					} else {
 						console.warn(`${chalk.yellow("WARN")} asset not inlined: ${chalk.green(a.fileName)}`)
