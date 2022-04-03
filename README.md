@@ -16,6 +16,8 @@ Web applications running from a local file have some browser security limitation
 - Limited state management options -- no cookies, no `localStorage`. However, you can use the new FileSystem API, with user permission.
 - Some web features that require a secure context may not be available.
 
+This doesn't _remove_ the build artifacts from the `dist` folder, it just embeds them in the `index.html`. You can ignore the extra files. I'd be open to a PR to remove the recognized files so the `dist` folder is cleaner, especially if there's a way to just prevent them from being written in the first place (_i.e._, not having to delete the files). (Note: removing the entries from `ctx.bundle` does not prevent the files from being written [#24].)
+
 ## How do I use it?
 
 Here's an example `vite.config.ts` file.
@@ -43,13 +45,12 @@ export default defineConfig({
 })
 ```
 
-- The `cssCodeSplit` option results in all CSS being emitted as a single file, which `vite-plugin-singlefile` can then inline.
 - The `assetsInlineLimit` ensures that even very large assets are inlined in your JavaScript.
-- The `inlineDynamicImports` also ensures that as many resources as possible are inlined.
-- The `manualChunks` option became necessary somewhere around Vite 2.0 release to prevent the creation of a separate `vendor.js` bundle. `outputOptions` became just `output` some time after that.
-- The `brotliSize` option just avoids the extra step of testing Brotli compression, which isn't really pertinent to a file served locally.
 - The `chunkSizeWarningLimit` option just avoids the warnings about large chunks.
-- The filename you choose for `manualChunks` ultimately doesn't matter, it will get rolled into `index.html` by the plugin.
+- The `cssCodeSplit` option results in all CSS being emitted as a single file, which `vite-plugin-singlefile` can then inline.
+- The `brotliSize` option just avoids the extra step of testing Brotli compression, which isn't really pertinent to a file served locally.
+- The `inlineDynamicImports` also ensures that as many resources as possible are inlined.
+- The `manualChunks` option became necessary somewhere around Vite 2.0 release to prevent the creation of a separate `vendor.js` bundle. The filename you choose for `manualChunks` ultimately doesn't matter, it will get rolled into `index.html` by the plugin.`outputOptions` became just `output` some time after that. This is _apparently_ [not needed](https://github.com/vitejs/vite/discussions/2462#discussioncomment-2444172) as of Vite 2.9, but I'm leaving it here for now in case folks are still using older versions of Vite.
 
 ### Caveats
 
@@ -60,6 +61,11 @@ export default defineConfig({
 ### Installation
 
 `yarn add vite-plugin-singlefile -D` or `npm i vite-plugin-singlefile -D`
+
+## Contributing
+
+- Please have PrettierJS installed so your IDE formatting doesn't overwrite the formatting in the source files
+- Please clone [vite-plugin-singlefile-example](https://github.com/richardtallent/vite-plugin-singlefile-example) in a sister folder and use it to test your modifications to this plugin before submitting a PR. (I'm happy to take PRs for it as well if you want to add more edge cases to test, such as a large third-party dependency. It's pretty barebones for now.)
 
 ## License
 
