@@ -56,7 +56,6 @@ export default defineConfig({
 - `favicon` resources are not inlined by Vite, and this plugin doesn't do that either.
 - There may be other situations where referenced files aren't inlined by Vite and aren't caught by this plugin either. I've done little testing so far, I just wanted to get this out there first.
 - This is my first Vite and first Rollup plugin. I have no idea what I'm doing. PRs welcome.
-- This doesn't _remove_ the build artifacts from the `dist` folder, it just embeds them in the `index.html`. You can ignore the extra files. I'd be open to a PR to remove the recognized files so the `dist` folder is cleaner, especially if there's a way to just prevent them from being written in the first place (_i.e._, not having to delete the files).
 
 ### Installation
 
