@@ -52,6 +52,16 @@ export default defineConfig({
 - The `inlineDynamicImports` also ensures that as many resources as possible are inlined.
 - The `manualChunks` option became necessary somewhere around Vite 2.0 release to prevent the creation of a separate `vendor.js` bundle. The filename you choose for `manualChunks` ultimately doesn't matter, it will get rolled into `index.html` by the plugin.`outputOptions` became just `output` some time after that. This is _apparently_ [not needed](https://github.com/vitejs/vite/discussions/2462#discussioncomment-2444172) as of Vite 2.9, but I'm leaving it here for now in case folks are still using older versions of Vite.
 
+### Config
+
+You can optionally include a config to optimize your build:
+
+```ts
+viteSingleFile({
+	removeViteModuleLoader: true, // Remove the unused vite module loader. Safe to do since all JS is inlined by this plugin.
+})
+```
+
 ### Caveats
 
 - `favicon` resources are not inlined by Vite, and this plugin doesn't do that either.
