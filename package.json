@@ -30,17 +30,13 @@
 	},
 	"homepage": "https://github.com/richardtallent/vite-plugin-singlefile/tree/main/#readme",
 	"dependencies": {
-		"@rollup/plugin-node-resolve": "^13.1.3",
-		"chalk": "^4.1.0",
-		"esbuild": "^0.14.30",
-		"rollup": "^2.70.1",
-		"rollup-plugin-esbuild": "^4.8.2"
+		"chalk": "^5.0.1",
+		"rollup": "^2.70.2"
 	},
 	"peerDependencies": {
-		"vite": "^2.9.1"
+		"vite": "^2.9.5"
 	},
 	"devDependencies": {
-		"@types/ws": "^8.5.3",
 		"rimraf": "^3.0.2",
 		"typescript": "^4.6.3"
 	},
