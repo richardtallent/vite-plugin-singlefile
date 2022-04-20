@@ -43,6 +43,5 @@ const _removeViteModuleLoader = (html: string) => {
 	const match = html.match(/(<script type="module">[\s\S]*)(const (\S)=function\(\)\{[\s\S]*\};\3\(\);)/)
 	// Graceful fallback if Vite updates the format of their module loader in the future.
 	if (!match || match.length < 3) return html
-
 	return html.replace(match[1], '  <script type="module">').replace(match[2], "")
 }

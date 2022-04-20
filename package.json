@@ -1,6 +1,6 @@
 {
 	"name": "vite-plugin-singlefile",
-	"version": "0.7.2",
+	"version": "0.8.0",
 	"description": "Vite plugin for inlining JavaScript and CSS resources",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
@@ -37,8 +37,8 @@
 	},
 	"devDependencies": {
 		"rimraf": "^3.0.2",
-		"typescript": "^4.6.3",
 		"rollup": "^2.70.2",
+		"typescript": "^4.6.3",
 		"@types/node": "^17.0.24"
 	},
 	"prettier": {

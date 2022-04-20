@@ -13,3 +13,4 @@
 | 2022-03-01 | 0.7.0   | Update deps. Warn for assets not inlined rather than adding comments (#21, thanks @taybart!)   |
 | 2022-03-02 | 0.7.1   | Downgrade chalk, fixes #22                                                                     |
 | 2022-04-03 | 0.7.2   | Update deps. Remove unneeded code (#24).                                                       |
+| 2022-04-19 | 0.8.0   | Option to remove unnecessary Vite loader (#26). Switch to ESM, update/remove deps (#25).       |
