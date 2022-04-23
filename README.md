@@ -29,36 +29,34 @@ import { viteSingleFile } from "vite-plugin-singlefile"
 
 export default defineConfig({
 	plugins: [vue(), viteSingleFile()],
-	build: {
-		target: "esnext",
-		assetsInlineLimit: 100000000,
-		chunkSizeWarningLimit: 100000000,
-		cssCodeSplit: false,
-		brotliSize: false,
-		rollupOptions: {
-			inlineDynamicImports: true,
-			output: {
-				manualChunks: () => "everything.js",
-			},
-		},
-	},
 })
 ```
 
-- The `assetsInlineLimit` ensures that even very large assets are inlined in your JavaScript.
-- The `chunkSizeWarningLimit` option just avoids the warnings about large chunks.
-- The `cssCodeSplit` option results in all CSS being emitted as a single file, which `vite-plugin-singlefile` can then inline.
-- The `brotliSize` option just avoids the extra step of testing Brotli compression, which isn't really pertinent to a file served locally.
-- The `inlineDynamicImports` also ensures that as many resources as possible are inlined.
-- The `manualChunks` option became necessary somewhere around Vite 2.0 release to prevent the creation of a separate `vendor.js` bundle. The filename you choose for `manualChunks` ultimately doesn't matter, it will get rolled into `index.html` by the plugin.`outputOptions` became just `output` some time after that. This is _apparently_ [not needed](https://github.com/vitejs/vite/discussions/2462#discussioncomment-2444172) as of Vite 2.9, but I'm leaving it here for now in case folks are still using older versions of Vite.
-
 ### Config
 
-You can optionally include a config to optimize your build:
+You can optionally include a config object to optimize your build:
+
+```ts
+viteSingleFile({ removeViteModuleLoader: true })
+```
+
+Here's a full reference of available options:
 
 ```ts
 viteSingleFile({
-	removeViteModuleLoader: true, // Remove the unused vite module loader. Safe to do since all JS is inlined by this plugin.
+	/**
+	 * Modifies the Vite build config to make this plugin work well.
+	 * See plugin implementation for more details on how this works.
+	 *
+	 * @default true
+	 */
+	useRecommendedBuildConfig: true,
+	/**
+	 * Remove the unused Vite module loader. Safe to do since all JS is inlined by this plugin.
+	 *
+	 * @default false
+	 */
+	removeViteModuleLoader: true,
 })
 ```
 
