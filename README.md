@@ -16,11 +16,11 @@ Web applications running from a local file have some browser security limitation
 - Limited state management options -- no cookies, no `localStorage`. However, you can use the new FileSystem API, with user permission.
 - Some web features that require a secure context may not be available.
 
-This doesn't _remove_ the build artifacts from the `dist` folder, it just embeds them in the `index.html`. You can ignore the extra files. I'd be open to a PR to remove the recognized files so the `dist` folder is cleaner, especially if there's a way to just prevent them from being written in the first place (_i.e._, not having to delete the files). (Note: removing the entries from `ctx.bundle` does not prevent the files from being written [#24].)
+This doesn't _remove_ the build artifacts from the `dist` folder, it just embeds them in the `index.html`. You can ignore the extra files. I am open to a PR to remove the inlined files so the `dist` folder is cleaner, especially if there's a way to just prevent them from being written in the first place (_i.e._, not having to delete the files). (Note: removing the entries from `ctx.bundle` does not prevent the files from being written [#24].)
 
 ## How do I use it?
 
-Here's an example `vite.config.ts` file.
+Here's an example `vite.config.ts` file using this plugin for a Vue.js app:
 
 ```ts
 import { defineConfig } from "vite"
@@ -34,30 +34,27 @@ export default defineConfig({
 
 ### Config
 
-You can optionally include a config object to optimize your build:
+You can pass a configuration object to modify how this plugin works. The options are described below:
+
+### useRecommendedBuildConfig
+
+Defaults to `true`. This plugin will automatically adjust your vite configuration to allow assets to
+be combined int a single file. To disable this:
+
+```ts
+viteSingleFile({ useRecommendedBuildConfig: false })
+```
+
+Refer to the `_useRecommendedBuildConfig` function in the `index.ts` file of this repository to see the
+recommended configuration.
+
+### removeViteModuleLoader
+
+Defaults to `false`. Vite includes a function in your build to load other bundles. Since we're inlining
+all bundles, you can use this option to have the bundle-loading function removed from your final build:
 
 ```ts
 viteSingleFile({ removeViteModuleLoader: true })
-```
-
-Here's a full reference of available options:
-
-```ts
-viteSingleFile({
-	/**
-	 * Modifies the Vite build config to make this plugin work well.
-	 * See plugin implementation for more details on how this works.
-	 *
-	 * @default true
-	 */
-	useRecommendedBuildConfig: true,
-	/**
-	 * Remove the unused Vite module loader. Safe to do since all JS is inlined by this plugin.
-	 *
-	 * @default false
-	 */
-	removeViteModuleLoader: true,
-})
 ```
 
 ### Caveats

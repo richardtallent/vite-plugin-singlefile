@@ -3,18 +3,14 @@ import { OutputChunk, OutputAsset, OutputOptions } from "rollup"
 import chalk from "chalk"
 
 export type Config = {
-	/**
-	 * Modifies the Vite build config to make this plugin work well.
-	 * See plugin implementation for more details on how this works.
-	 *
-	 * @default true
-	 */
+	// Modifies the Vite build config to make this plugin work well. See `_useRecommendedBuildConfig`
+	// in the plugin implementation for more details on how this works.
+	//
+	// @default true
 	useRecommendedBuildConfig?: boolean
-	/**
-	 * Remove the unused Vite module loader. Safe to do since all JS is inlined by this plugin.
-	 *
-	 * @default false
-	 */
+	// Remove the unused Vite module loader. Safe to do since all JS is inlined by this plugin.
+	//
+	// @default false
 	removeViteModuleLoader?: boolean
 }
 
@@ -52,9 +48,7 @@ export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteMod
 	}
 }
 
-/**
- * Optionally remove the Vite module loader since it's no longer needed when this plugin has inlined all code.
- */
+// Optionally remove the Vite module loader since it's no longer needed because this plugin has inlined all code.
 const _removeViteModuleLoader = (html: string) => {
 	const match = html.match(/(<script type="module">[\s\S]*)(const (\S)=function\(\)\{[\s\S]*\};\3\(\);)/)
 	// Graceful fallback if Vite updates the format of their module loader in the future.
@@ -62,9 +56,7 @@ const _removeViteModuleLoader = (html: string) => {
 	return html.replace(match[1], '  <script type="module">').replace(match[2], "")
 }
 
-/**
- * Modifies the Vite build config to make this plugin work well.
- */
+// Modifies the Vite build config to make this plugin work well.
 const _useRecommendedBuildConfig = (config: UserConfig) => {
 	if (!config.build) config.build = {}
 	// Ensures that even very large assets are inlined in your JavaScript.
@@ -82,10 +74,6 @@ const _useRecommendedBuildConfig = (config: UserConfig) => {
 	const updateOutputOptions = (out: OutputOptions) => {
 		// Ensure that as many resources as possible are inlined.
 		out.inlineDynamicImports = true
-		// The `manualChunks` option became necessary somewhere around Vite 2.0 release to prevent the creation of a separate `vendor.js` bundle.
-		// The filename you choose for `manualChunks` ultimately doesn't matter, it will get rolled into `index.html` by the plugin.`outputOptions` became just `output` some time after that.
-		// This is _apparently_ [not needed](https://github.com/vitejs/vite/discussions/2462#discussioncomment-2444172) as of Vite 2.9, but I'm leaving it here for now in case folks are still using older versions of Vite.
-		out.manualChunks = () => "everything.js"
 	}
 
 	if (!Array.isArray(config.build.rollupOptions.output)) {
