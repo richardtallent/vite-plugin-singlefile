@@ -31,7 +31,9 @@ export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteMod
 					const a = value as OutputAsset
 					if (o.code) {
 						const reScript = new RegExp(`<script type="module"[^>]*?src="[\./]*${o.fileName}"[^>]*?></script>`)
-						const code = `<script type="module">\n//${o.fileName}\n${o.code}\n</script>`
+						const preloadMarker = '"__VITE_PRELOAD__"'
+						const codeRaw = o.code.replace(preloadMarker, 'void 0')
+						const code = `<script type="module">\n//${o.fileName}\n${codeRaw}\n</script>`
 						const inlined = html.replace(reScript, (_) => code)
 						html = removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
 					} else if (a.fileName.endsWith(".css")) {
