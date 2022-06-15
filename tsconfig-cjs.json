@@ -1,0 +1,9 @@
+{
+	"extends": "./tsconfig-base.json",
+	"compilerOptions": {
+		"declarationDir": "dist/cjs/declarations",
+		"module": "commonjs",
+		"outDir": "dist/cjs",
+		"target": "es2015"
+	}
+}

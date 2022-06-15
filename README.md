@@ -57,11 +57,20 @@ all bundles, you can use this option to have the bundle-loading function removed
 viteSingleFile({ removeViteModuleLoader: true })
 ```
 
+### inlinePattern
+
+Defaults to `[]`, which will inline all recognized JavaScript and CSS assets. You can provide a string
+array of "glob" patterns to limit the inlining to certain assets. Any assets missed by your patterns will
+generate a warning (same as any unrecognized assets).
+
 ### Caveats
 
 - `favicon` resources are not inlined by Vite, and this plugin doesn't do that either.
 - There may be other situations where referenced files aren't inlined by Vite and aren't caught by this plugin either. I've done little testing so far, I just wanted to get this out there first.
 - This is my first Vite and first Rollup plugin. I have no idea what I'm doing. PRs welcome.
+- This plugin uses dual packages to support both ESM and CommonJS users. This _should_ work automatically. Details:
+  - <https://nodejs.org/api/packages.html#packages_dual_package_hazard>
+  - <https://www.sensedeep.com/blog/posts/2021/how-to-create-single-source-npm-module.html>
 
 ### Installation
 
@@ -71,6 +80,7 @@ viteSingleFile({ removeViteModuleLoader: true })
 
 - Please have PrettierJS installed so your IDE formatting doesn't overwrite the formatting in the source files
 - Please clone [vite-plugin-singlefile-example](https://github.com/richardtallent/vite-plugin-singlefile-example) in a sister folder and use it to test your modifications to this plugin before submitting a PR. (I'm happy to take PRs for it as well if you want to add more edge cases to test, such as a large third-party dependency. It's pretty barebones for now.)
+- I wasn't able to persuade Jest to run on the bare source file, so it instead compiles and runs the CommonJS distribution file.
 
 ## License
 

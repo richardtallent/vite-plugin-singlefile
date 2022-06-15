@@ -1,6 +1,6 @@
-import { IndexHtmlTransformResult, IndexHtmlTransformContext, UserConfig, Plugin } from "vite"
+import { UserConfig, Plugin } from "vite"
 import { OutputChunk, OutputAsset, OutputOptions } from "rollup"
-import chalk from "chalk"
+import micromatch from "micromatch"
 
 export type Config = {
 	// Modifies the Vite build config to make this plugin work well. See `_useRecommendedBuildConfig`
@@ -12,38 +12,63 @@ export type Config = {
 	//
 	// @default false
 	removeViteModuleLoader?: boolean
+	// Optionally, only inline assets that match one or more glob patterns.
+	//
+	// @default []
+	inlinePattern?: string[]
 }
 
 const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false }
 
-export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteModuleLoader = false }: Config = defaultConfig): Plugin {
+export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
+	const reScript = new RegExp(`<script([^>]*?) src="[./]*${scriptFilename}"([^>]*)></script>`)
+	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>\n//${scriptFilename}\n${scriptCode}\n</script>`)
+	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
+}
+
+export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
+	const reCss = new RegExp(`<link[^>]*? href="[./]*${scriptFilename}"[^>]*?>`)
+	const inlined = html.replace(reCss, `<style type="text/css">\n${scriptCode}\n</style>`)
+	return inlined
+}
+
+const warnNotInlined = (filename: string) => console.warn(`WARNING: asset not inlined: ${filename}`)
+
+export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteModuleLoader = false, inlinePattern = [] }: Config = defaultConfig): Plugin {
 	return {
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
-		transformIndexHtml: {
-			enforce: "post",
-			transform(html: string, ctx?: IndexHtmlTransformContext): IndexHtmlTransformResult {
-				// Only use this plugin during build
-				if (!ctx || !ctx.bundle) return html
-				// Get the bundle
-				for (const [, value] of Object.entries(ctx.bundle)) {
-					const o = value as OutputChunk
-					const a = value as OutputAsset
-					if (o.code) {
-						const reScript = new RegExp(`<script type="module"[^>]*?src="[\./]*${o.fileName}"[^>]*?></script>`)
-						const code = `<script type="module">\n//${o.fileName}\n${o.code}\n</script>`
-						const inlined = html.replace(reScript, (_) => code)
-						html = removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
-					} else if (a.fileName.endsWith(".css")) {
-						const reCSS = new RegExp(`<link rel="stylesheet"[^>]*?href="[\./]*${a.fileName}"[^>]*?>`)
-						const code = `<style type="text/css">\n${a.source}\n</style>`
-						html = html.replace(reCSS, (_) => code)
+		enforce: "post",
+		generateBundle: (_, bundle) => {
+			const htmlFiles = Object.keys(bundle).filter((i) => i.endsWith(".html"))
+			const cssAssets = Object.keys(bundle).filter((i) => i.endsWith(".css"))
+			const jsAssets = Object.keys(bundle).filter((i) => i.endsWith(".js"))
+			for (const name of htmlFiles) {
+				const htmlChunk = bundle[name] as OutputAsset
+				let replacedHtml = htmlChunk.source as string
+				for (const jsName of jsAssets) {
+					if (!inlinePattern.length || micromatch.isMatch(jsName, inlinePattern)) {
+						const jsChunk = bundle[jsName] as OutputChunk
+						replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader)
+						delete bundle[jsName]
 					} else {
-						console.warn(`${chalk.yellow("WARN")} asset not inlined: ${chalk.green(a.fileName)}`)
+						warnNotInlined(jsName)
 					}
 				}
-				return html
-			},
+				for (const cssName of cssAssets) {
+					if (!inlinePattern.length || micromatch.isMatch(cssName, inlinePattern)) {
+						const cssChunk = bundle[cssName] as OutputAsset
+						replacedHtml = replaceCss(replacedHtml, cssChunk.fileName, cssChunk.source as string)
+						delete bundle[cssName]
+					} else {
+						warnNotInlined(cssName)
+					}
+				}
+				htmlChunk.source = replacedHtml
+			}
+			for (const name of Object.keys(bundle).filter((i) => !i.endsWith(".js") && !i.endsWith(".css") && !i.endsWith(".html"))) {
+				warnNotInlined(name)
+			}
 		},
 	}
 }

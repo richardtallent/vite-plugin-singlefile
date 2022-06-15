@@ -1,16 +1,25 @@
 {
 	"name": "vite-plugin-singlefile",
-	"version": "0.9.0",
+	"version": "0.10.0-beta",
 	"description": "Vite plugin for inlining JavaScript and CSS resources",
-	"main": "dist/index.js",
-	"typings": "dist/index.d.ts",
+	"main": "dist/cjs/index.js",
+	"module": "dist/esm/index.js",
+	"exports": {
+		".": {
+			"import": "./dist/esm/index.js",
+			"require": "./dist/cjs/index.js"
+		}
+	},
+	"typings": "dist/esm/declarations/index.d.ts",
 	"files": [
 		"dist"
 	],
 	"scripts": {
 		"dev": "rimraf dist && tsc -w --p tsconfig.json",
-		"build": "rimraf dist && tsc -p tsconfig.json",
-		"prepublishOnly": "npm run build"
+		"build": "rimraf dist && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
+		"prepublishOnly": "npm run build",
+		"test": "rimraf dist/cjs && tsc -p tsconfig-cjs.json && node --experimental-vm-modules ./node_modules/.bin/jest",
+		"lint": "eslint src/index.ts"
 	},
 	"keywords": [
 		"vite",
@@ -30,16 +39,22 @@
 	},
 	"homepage": "https://github.com/richardtallent/vite-plugin-singlefile/tree/main/#readme",
 	"dependencies": {
-		"chalk": "^5.0.1"
+		"jest": "^28.1.1",
+		"micromatch": "^4.0.5"
 	},
 	"peerDependencies": {
-		"vite": "^2.9.5"
+		"vite": "^2.9.12"
 	},
 	"devDependencies": {
+		"@types/jest": "^28.1.1",
+		"@types/micromatch": "^4.0.2",
+		"@types/node": "^17.0.42",
+		"@typescript-eslint/eslint-plugin": "^5.28.0",
+		"@typescript-eslint/parser": "^5.28.0",
+		"eslint": "^8.17.0",
 		"rimraf": "^3.0.2",
-		"rollup": "^2.70.2",
-		"typescript": "^4.6.3",
-		"@types/node": "^17.0.24"
+		"rollup": "^2.75.6",
+		"typescript": "^4.7.3"
 	},
 	"prettier": {
 		"useTabs": true,
@@ -48,6 +63,5 @@
 		"bracketSpacing": true,
 		"trailingComma": "es5",
 		"printWidth": 180
-	},
-	"type": "module"
+	}
 }
