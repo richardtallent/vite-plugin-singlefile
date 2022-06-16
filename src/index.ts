@@ -40,9 +40,10 @@ export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteMod
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
 		enforce: "post",
 		generateBundle: (_, bundle) => {
+			const jsExtensionTest = /\.[mc]?js$/
 			const htmlFiles = Object.keys(bundle).filter((i) => i.endsWith(".html"))
 			const cssAssets = Object.keys(bundle).filter((i) => i.endsWith(".css"))
-			const jsAssets = Object.keys(bundle).filter((i) => i.endsWith(".js"))
+			const jsAssets = Object.keys(bundle).filter((i) => jsExtensionTest.test(i))
 			for (const name of htmlFiles) {
 				const htmlChunk = bundle[name] as OutputAsset
 				let replacedHtml = htmlChunk.source as string
@@ -66,7 +67,7 @@ export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteMod
 				}
 				htmlChunk.source = replacedHtml
 			}
-			for (const name of Object.keys(bundle).filter((i) => !i.endsWith(".js") && !i.endsWith(".css") && !i.endsWith(".html"))) {
+			for (const name of Object.keys(bundle).filter((i) => !jsExtensionTest.test(i) && !i.endsWith(".css") && !i.endsWith(".html"))) {
 				warnNotInlined(name)
 			}
 		},
