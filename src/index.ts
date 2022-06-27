@@ -16,25 +16,29 @@ export type Config = {
 	//
 	// @default []
 	inlinePattern?: string[]
+	// Enables/disables debug comments with filename in script tags
+	//
+	// @default true
+	addDebugComments: boolean
 }
 
-const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false }
+const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false, addDebugComments: true }
 
-export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
+export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false, addDebugComments = true): string {
 	const reScript = new RegExp(`<script([^>]*?) src="[./]*${scriptFilename}"([^>]*)></script>`)
-	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>\n//${scriptFilename}\n${scriptCode}\n</script>`)
+	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>${addDebugComments ? `\n//${scriptFilename}\n` : ''}${scriptCode}\n</script>`)
 	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
 }
 
-export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
-	const reCss = new RegExp(`<link[^>]*? href="[./]*${scriptFilename}"[^>]*?>`)
-	const inlined = html.replace(reCss, `<style type="text/css">\n${scriptCode}\n</style>`)
+export function replaceCss(html: string, cssFilename: string, cssCode: string): string {
+	const reCss = new RegExp(`<link[^>]*? href="[./]*${cssFilename}"[^>]*?>`)
+	const inlined = html.replace(reCss, `<style type="text/css">\n${cssCode}\n</style>`)
 	return inlined
 }
 
 const warnNotInlined = (filename: string) => console.warn(`WARNING: asset not inlined: ${filename}`)
 
-export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteModuleLoader = false, inlinePattern = [] }: Config = defaultConfig): Plugin {
+export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteModuleLoader = false, inlinePattern = [], addDebugComments = true }: Config = defaultConfig): Plugin {
 	return {
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
@@ -50,7 +54,7 @@ export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteMod
 				for (const jsName of jsAssets) {
 					if (!inlinePattern.length || micromatch.isMatch(jsName, inlinePattern)) {
 						const jsChunk = bundle[jsName] as OutputChunk
-						replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader)
+						replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader, addDebugComments)
 						delete bundle[jsName]
 					} else {
 						warnNotInlined(jsName)
