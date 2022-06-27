@@ -26,7 +26,7 @@ const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader:
 
 export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false, addDebugComments = true): string {
 	const reScript = new RegExp(`<script([^>]*?) src="[./]*${scriptFilename}"([^>]*)></script>`)
-	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>${addDebugComments ? `\n//${scriptFilename}\n` : ''}${scriptCode}\n</script>`)
+	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>\n${addDebugComments ? `//${scriptFilename}\n` : ''}${scriptCode}\n</script>`)
 	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
 }
 
