@@ -16,8 +16,6 @@ Web applications running from a local file have some browser security limitation
 - Limited state management options -- no cookies, no `localStorage`. However, you can use the new FileSystem API, with user permission.
 - Some web features that require a secure context may not be available.
 
-This doesn't _remove_ the build artifacts from the `dist` folder, it just embeds them in the `index.html`. You can ignore the extra files. I am open to a PR to remove the inlined files so the `dist` folder is cleaner, especially if there's a way to just prevent them from being written in the first place (_i.e._, not having to delete the files). (Note: removing the entries from `ctx.bundle` does not prevent the files from being written [#24].)
-
 ## How do I use it?
 
 Here's an example `vite.config.ts` file using this plugin for a Vue.js app:

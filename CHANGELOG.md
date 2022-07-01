@@ -26,3 +26,7 @@
 |            |               | Added some basic tests (Jest)                                                                  |
 |            |               | Added eslint, removed unnecessary escapes for "." in regex patterns                            |
 | 2022-06-16 | 0.10.0-beta.2 | Add support for .mjs and .cjs file extensions (#38)                                            |
+| 2022-07-01 | 0.10.0        | Fix where some bundles are undefined (#41)                                                     |
+|            |               | Remove filename comment from injected scripts (#39)                                            |
+|            |               | Remove unneeded Vite Preload marker (#34)                                                      |
+|            |               | Make jest a dev dependency only (#40)                                                          |
