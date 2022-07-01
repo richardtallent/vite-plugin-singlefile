@@ -50,8 +50,8 @@ export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteMod
 				for (const jsName of jsAssets) {
 					if (!inlinePattern.length || micromatch.isMatch(jsName, inlinePattern)) {
 						const jsChunk = bundle[jsName] as OutputChunk
+						(bundle[jsName] as OutputChunk & { delete?: boolean }).delete = true;
 						replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader)
-						delete bundle[jsName]
 					} else {
 						warnNotInlined(jsName)
 					}
@@ -59,13 +59,29 @@ export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteMod
 				for (const cssName of cssAssets) {
 					if (!inlinePattern.length || micromatch.isMatch(cssName, inlinePattern)) {
 						const cssChunk = bundle[cssName] as OutputAsset
+						(bundle[cssName] as OutputAsset & { delete?: boolean }).delete = true;
 						replacedHtml = replaceCss(replacedHtml, cssChunk.fileName, cssChunk.source as string)
-						delete bundle[cssName]
 					} else {
 						warnNotInlined(cssName)
 					}
 				}
 				htmlChunk.source = replacedHtml
+			}
+			for (const jsName of jsAssets) {
+				if (
+					typeof (bundle[jsName] as OutputChunk & { delete?: boolean }).delete !== 'undefined' &&
+					(bundle[jsName] as OutputChunk & { delete?: boolean }).delete === true
+				) {
+					delete bundle[jsName];
+				}
+			}
+			for (const cssName of cssAssets) {
+				if (
+					typeof (bundle[cssName] as OutputAsset & { delete?: boolean }).delete !== 'undefined' &&
+					(bundle[cssName] as OutputAsset & { delete?: boolean }).delete === true
+				) {
+					delete bundle[cssName]
+				}
 			}
 			for (const name of Object.keys(bundle).filter((i) => !jsExtensionTest.test(i) && !i.endsWith(".css") && !i.endsWith(".html"))) {
 				warnNotInlined(name)
