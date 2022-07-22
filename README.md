@@ -16,6 +16,14 @@ Web applications running from a local file have some browser security limitation
 - Limited state management options -- no cookies, no `localStorage`. However, you can use the new FileSystem API, with user permission.
 - Some web features that require a secure context may not be available.
 
+## Installation
+
+`npm install vite-plugin-singlefile --save-dev`
+
+or
+
+`yarn add vite-plugin-singlefile --dev`
+
 ## How do I use it?
 
 Here's an example `vite.config.ts` file using this plugin for a Vue.js app:
@@ -69,10 +77,6 @@ generate a warning (same as any unrecognized assets).
 - This plugin uses dual packages to support both ESM and CommonJS users. This _should_ work automatically. Details:
   - <https://nodejs.org/api/packages.html#packages_dual_package_hazard>
   - <https://www.sensedeep.com/blog/posts/2021/how-to-create-single-source-npm-module.html>
-
-### Installation
-
-`yarn add vite-plugin-singlefile -D` or `npm i vite-plugin-singlefile -D`
 
 ## Contributing
 
