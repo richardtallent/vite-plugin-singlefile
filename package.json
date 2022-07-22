@@ -42,7 +42,7 @@
 		"micromatch": "^4.0.5"
 	},
 	"peerDependencies": {
-		"vite": "^2.9.13"
+		"vite": "^2.9.13 || ^3.0.0"
 	},
 	"devDependencies": {
 		"jest": "^28.1.2",
