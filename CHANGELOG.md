@@ -30,3 +30,4 @@
 |            |               | Remove filename comment from injected scripts (#39)                                            |
 |            |               | Remove unneeded Vite Preload marker (#34)                                                      |
 |            |               | Make jest a dev dependency only (#40)                                                          |
+| 2022-07-23 | 0.11.0        | Widen version range for Vite peer dependency to support Vite 3.0 (#46, #47, thanks @valtism!)  |
