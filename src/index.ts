@@ -53,8 +53,8 @@ export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteMod
 				for (const jsName of jsAssets) {
 					if (!inlinePattern.length || micromatch.isMatch(jsName, inlinePattern)) {
 						const jsChunk = bundle[jsName] as OutputChunk
-						bundlesToDelete.push(jsName)
 						if (jsChunk.code != null) {
+							bundlesToDelete.push(jsName)
 							replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader)
 						}
 					} else {

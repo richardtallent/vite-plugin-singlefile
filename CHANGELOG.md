@@ -31,3 +31,4 @@
 |            |               | Remove unneeded Vite Preload marker (#34)                                                      |
 |            |               | Make jest a dev dependency only (#40)                                                          |
 | 2022-07-23 | 0.11.0        | Widen version range for Vite peer dependency to support Vite 3.0 (#46, #47, thanks @valtism!)  |
+| 2022-08-06 | 0.11.1        | Check for null code due to worker URLs (#49, thanks @daniel-kun!)                              |
