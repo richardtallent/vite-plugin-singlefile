@@ -72,6 +72,7 @@ generate a warning (same as any unrecognized assets).
 ### Caveats
 
 - `favicon` resources are not inlined by Vite, and this plugin doesn't do that either.
+- Inlining of SVG isn't supported directly by Vite, so it isn't supported directly here either. You'll need to use something like `https://github.com/jpkleemans/vite-svg-loader`, or put your SVG directly into the template.
 - There may be other situations where referenced files aren't inlined by Vite and aren't caught by this plugin either. I've done little testing so far, I just wanted to get this out there first.
 - This is my first Vite and first Rollup plugin. I have no idea what I'm doing. PRs welcome.
 - This plugin uses dual packages to support both ESM and CommonJS users. This _should_ work automatically. Details:

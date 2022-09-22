@@ -23,7 +23,7 @@ const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader:
 export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
 	const reScript = new RegExp(`<script([^>]*?) src="[./]*${scriptFilename}"([^>]*)></script>`)
 	const preloadMarker = '"__VITE_PRELOAD__"'
-	const newCode = scriptCode.replace(preloadMarker, "void 0")
+	const newCode = scriptCode.replaceAll(preloadMarker, "void 0")
 	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>\n${newCode}\n</script>`)
 	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
 }
@@ -101,6 +101,8 @@ const _useRecommendedBuildConfig = (config: UserConfig) => {
 	config.build.cssCodeSplit = false
 	// Avoids the extra step of testing Brotli compression, which isn't really pertinent to a file served locally.
 	config.build.reportCompressedSize = false
+	// Subfolder bases are not supported, and shouldn't be needed because we're embedding everything.
+	config.base = undefined
 
 	if (!config.build.rollupOptions) config.build.rollupOptions = {}
 	if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
@@ -110,9 +112,9 @@ const _useRecommendedBuildConfig = (config: UserConfig) => {
 		out.inlineDynamicImports = true
 	}
 
-	if (!Array.isArray(config.build.rollupOptions.output)) {
-		updateOutputOptions(config.build.rollupOptions.output)
+	if (Array.isArray(config.build.rollupOptions.output)) {
+		for (const o in config.build.rollupOptions.output) updateOutputOptions(o as OutputOptions)
 	} else {
-		config.build.rollupOptions.output.forEach(updateOutputOptions)
+		updateOutputOptions(config.build.rollupOptions.output as OutputOptions)
 	}
 }
