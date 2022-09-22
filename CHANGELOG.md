@@ -32,9 +32,10 @@
 |            |               | Make jest a dev dependency only (#40)                                                          |
 | 2022-07-23 | 0.11.0        | Widen version range for Vite peer dependency to support Vite 3.0 (#46, #47, thanks @valtism!)  |
 | 2022-08-06 | 0.11.1        | Check for null code due to worker URLs (#49, thanks @daniel-kun!)                              |
-| 2022-08-06 | 0.12.0        | Set config `base` to `undefined` in recommended options (#56)                                  |
+| 2022-09-21 | 0.12.0        | Set config `base` to `undefined` in recommended options (#56)                                  |
 |            |               | Remove optional `type` attribute from style tags (#53, thanks @kidonng!)                       |
 |            |               | Remove all `VITE_PRELOAD` markers (#55)                                                        |
 |            |               | Point package.json to types file (#54, thanks @kidonng!)                                       |
 |            |               | Update various dependencies                                                                    |
 |            |               | Add README note about SVG (#52)                                                                |
+| 2022-09-21 | 0.12.1        | Rebase... doh!                                                                                 |
