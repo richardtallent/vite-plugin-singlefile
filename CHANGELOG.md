@@ -39,3 +39,4 @@
 |            |               | Update various dependencies                                                                    |
 |            |               | Add README note about SVG (#52)                                                                |
 | 2022-09-21 | 0.12.1        | Rebase... doh!                                                                                 |
+| 2022-10-01 | 0.12.2        | Resolve preload script issue (#58)                                                             |

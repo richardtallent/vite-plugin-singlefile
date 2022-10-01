@@ -83,18 +83,12 @@ export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteMod
 }
 
 // Optionally remove the Vite module loader since it's no longer needed because this plugin has inlined all code.
-const _removeViteModuleLoader = (html: string) => {
-	// How to update if this breaks:
-	// Copy the Vite module loader script from the build output, and the broken regex below and paste it into for example https://regexr.com
-	// Then tweak the regex until it matches the new loader script.
-
-	// Learn more and see a screenshot of how to update:
-	// https://github.com/richardtallent/vite-plugin-singlefile/issues/57#issuecomment-1263950209
-	const match = html.match(/(<script type="module" crossorigin>[\s\S]*)(\(function\(\)\{[\s\S]*\}\)\(\);)/)
-	// Graceful fallback if Vite updates the format of their module loader in the future.
-	if (!match || match.length < 3) return html
-	return html.replace(match[1], '  <script type="module">').replace(match[2], "")
-}
+// This assumes that the Module Loader is (1) the FIRST function declared in the module, (2) an IIFE, (3) is minified,
+// (4) is within a script with no unexpected attribute values, and (5) that the containing script is the first script
+// tag that matches the above criteria. Changes to the SCRIPT tag especially could break this again in the future.
+// Update example:
+// https://github.com/richardtallent/vite-plugin-singlefile/issues/57#issuecomment-1263950209
+const _removeViteModuleLoader = (html: string) => html.replace(/(<script type="module" crossorigin>\s*)\(function\(\)\{[\s\S]*?\}\)\(\);/, '<script type="module">\n')
 
 // Modifies the Vite build config to make this plugin work well.
 const _useRecommendedBuildConfig = (config: UserConfig) => {
