@@ -1,12 +1,12 @@
 # vite-plugin-singlefile
 
-This Vite build plugin allows you to _inline_ all JavaScript and CSS resources directly into the final `dist/index.html` file. By doing this, your _enter web app_ can be embedded and distributed as a single HTML file.
+This Vite build plugin allows you to _inline_ all JavaScript and CSS resources directly into the final `dist/index.html` file. By doing this, your _entire web app_ can be embedded and distributed as a single HTML file.
 
 ## Why?
 
 Bundling your _entire_ site into one file certainly isn't recommended for most situations.
 
-However, this can be very handy for _offline_ web applications--apps you can simply opeen the HTML file in your default web browser. This might include utilities, expert system tools, documentation, demos, and other situations where you want the full power of a web browser, without the need for a Cordova or Electron wrapper or the pain of normal application installation.
+However, this can be very handy for _offline_ web applications--apps you can simply open the HTML file in your default web browser. This might include utilities, expert system tools, documentation, demos, and other situations where you want the full power of a web browser, without the need for a Cordova or Electron wrapper or the pain of normal application installation.
 
 ## Limitations
 
@@ -45,7 +45,7 @@ You can pass a configuration object to modify how this plugin works. The options
 ### useRecommendedBuildConfig
 
 Defaults to `true`. This plugin will automatically adjust your vite configuration to allow assets to
-be combined int a single file. To disable this:
+be combined into a single file. To disable this:
 
 ```ts
 viteSingleFile({ useRecommendedBuildConfig: false })
