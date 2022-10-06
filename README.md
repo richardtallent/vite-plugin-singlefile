@@ -18,6 +18,8 @@ Web applications running from a local file have some browser security limitation
 
 ## Installation
 
+Node 16 or above is required.
+
 `npm install vite-plugin-singlefile --save-dev`
 
 or
