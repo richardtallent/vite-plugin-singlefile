@@ -40,3 +40,4 @@
 |            |               | Add README note about SVG (#52)                                                                |
 | 2022-09-21 | 0.12.1        | Rebase... doh!                                                                                 |
 | 2022-10-01 | 0.12.2        | Resolve preload script issue (#58)                                                             |
+| 2022-10-15 | 0.12.3        | Update various dependencies (including Rollup 3.x), ran tests, no other changes                |

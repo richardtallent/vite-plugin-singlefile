@@ -18,13 +18,15 @@ Web applications running from a local file have some browser security limitation
 
 ## Installation
 
-Node 16 or above is required.
-
-`npm install vite-plugin-singlefile --save-dev`
+```shell
+npm install vite-plugin-singlefile --save-dev
+```
 
 or
 
-`yarn add vite-plugin-singlefile --dev`
+```shell
+yarn add vite-plugin-singlefile --dev
+```
 
 ## How do I use it?
 
@@ -75,7 +77,7 @@ generate a warning (same as any unrecognized assets).
 
 - `favicon` resources are not inlined by Vite, and this plugin doesn't do that either.
 - Inlining of SVG isn't supported directly by Vite, so it isn't supported directly here either. You'll need to use something like `https://github.com/jpkleemans/vite-svg-loader`, or put your SVG directly into the template.
-- There may be other situations where referenced files aren't inlined by Vite and aren't caught by this plugin either. I've done little testing so far, I just wanted to get this out there first.
+- There may be other situations where referenced files aren't inlined by Vite and aren't caught by this plugin either.
 - This is my first Vite and first Rollup plugin. I have no idea what I'm doing. PRs welcome.
 - This plugin uses dual packages to support both ESM and CommonJS users. This _should_ work automatically. Details:
   - <https://nodejs.org/api/packages.html#packages_dual_package_hazard>
