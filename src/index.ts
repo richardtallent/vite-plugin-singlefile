@@ -16,9 +16,13 @@ export type Config = {
 	//
 	// @default []
 	inlinePattern?: string[]
+	// Optionally, delete inlined assets preventing them from being output.
+	//
+	// @default true
+	deleteInlinedFiles?: boolean
 }
 
-const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false }
+const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false, deleteInlinedFiles: true }
 
 export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
 	const reScript = new RegExp(`<script([^>]*?) src="[./]*${scriptFilename}"([^>]*)></script>`)
@@ -36,7 +40,12 @@ export function replaceCss(html: string, scriptFilename: string, scriptCode: str
 
 const warnNotInlined = (filename: string) => console.warn(`WARNING: asset not inlined: ${filename}`)
 
-export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteModuleLoader = false, inlinePattern = [] }: Config = defaultConfig): Plugin {
+export function viteSingleFile({
+	useRecommendedBuildConfig = true,
+	removeViteModuleLoader = false,
+	inlinePattern = [],
+	deleteInlinedFiles = true,
+}: Config = defaultConfig): Plugin {
 	return {
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
@@ -72,8 +81,10 @@ export function viteSingleFile({ useRecommendedBuildConfig = true, removeViteMod
 				}
 				htmlChunk.source = replacedHtml
 			}
-			for (const name of bundlesToDelete) {
-				delete bundle[name]
+			if (deleteInlinedFiles) {
+				for (const name of bundlesToDelete) {
+					delete bundle[name]
+				}
 			}
 			for (const name of Object.keys(bundle).filter((i) => !jsExtensionTest.test(i) && !i.endsWith(".css") && !i.endsWith(".html"))) {
 				warnNotInlined(name)

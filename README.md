@@ -71,6 +71,10 @@ Defaults to `[]`, which will inline all recognized JavaScript and CSS assets. Yo
 array of "glob" patterns to limit the inlining to certain assets. Any assets missed by your patterns will
 generate a warning (same as any unrecognized assets).
 
+### deleteInlinedFiles
+
+Defaults to `true`, which deletes all inlined files that were inlined. A use case for turning this to `false` would be if you would like sourcemaps to be generated so you can upload them to an error tracking platform like Sentry.io.
+
 ### Caveats
 
 - `favicon` resources are not inlined by Vite, and this plugin doesn't do that either.
