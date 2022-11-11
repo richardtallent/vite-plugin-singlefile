@@ -15,6 +15,9 @@
 	"files": [
 		"dist"
 	],
+	"engines": {
+		"node": "^14.18.0 || >=16.0.0"
+	},
 	"scripts": {
 		"dev": "rimraf dist && tsc -w --p tsconfig.json",
 		"build": "rimraf dist && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
