@@ -11,14 +11,14 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        node: [ 16, 18 ]
+        node: [14, 16, 18]
     steps:
       - uses: actions/checkout@v3
       - name: Setup Node.JS ${{ matrix.node }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-          cache: 'npm'
+          cache: "npm"
       - run: npm ci # throws an error if package-lock.json is out-of-date
       - run: npm run lint
       - run: npm test
@@ -28,7 +28,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        node: [ 16, 18 ]
+        node: [14, 16, 18]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -41,7 +41,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: |
             vite-plugin-singlefile/package-lock.json
             vite-plugin-singlefile-example/package-lock.json
