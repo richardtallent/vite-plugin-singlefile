@@ -1,0 +1,55 @@
+name: Test
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        node: [ 16, 18 ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.JS ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+      - run: npm ci # throws an error if package-lock.json is out-of-date
+      - run: npm run lint
+      - run: npm test
+  test-example-project:
+    name: Test vite-plugin-singlefile-example
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        node: [ 16, 18 ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: vite-plugin-singlefile
+      - uses: actions/checkout@v3
+        with:
+          repository: richardtallent/vite-plugin-singlefile-example
+          path: vite-plugin-singlefile-example
+      - name: Setup Node.JS ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+          cache-dependency-path: |
+            vite-plugin-singlefile/package-lock.json
+            vite-plugin-singlefile-example/package-lock.json
+      - # build and install dependencies for the vite-plugin-singlefile package
+        run: npm ci
+        working-directory: vite-plugin-singlefile
+      - # don't use `npm ci` since the vite-plugin-singlefile-example is separate from this project
+        run: npm install
+        working-directory: vite-plugin-singlefile-example
+      - run: npm run build
+        working-directory: vite-plugin-singlefile-example

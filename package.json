@@ -20,8 +20,8 @@
 	},
 	"scripts": {
 		"dev": "rimraf dist && tsc -w --p tsconfig.json",
+		"prepare": "npm run build",
 		"build": "rimraf dist && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
-		"prepublishOnly": "npm run build",
 		"test": "rimraf dist/cjs && tsc -p tsconfig-cjs.json && node --experimental-vm-modules ./node_modules/.bin/jest",
 		"lint": "eslint src/index.ts"
 	},
