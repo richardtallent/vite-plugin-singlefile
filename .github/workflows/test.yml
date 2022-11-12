@@ -19,6 +19,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: "npm"
+      - name: Update NPM to >7
+        if: ${{ matrix.node }} == '14'
+        # old version of npms don't automatically install peerDependencies
+        run: npm install -g npm@9
       - run: npm ci # throws an error if package-lock.json is out-of-date
       - run: npm run lint
       - run: npm test
@@ -45,6 +49,10 @@ jobs:
           cache-dependency-path: |
             vite-plugin-singlefile/package-lock.json
             vite-plugin-singlefile-example/package-lock.json
+      - name: Update NPM to >7
+        if: ${{ matrix.node }} == '14'
+        # old version of npms don't automatically install peerDependencies
+        run: npm install -g npm@9
       - # build and install dependencies for the vite-plugin-singlefile package
         run: npm ci
         working-directory: vite-plugin-singlefile
