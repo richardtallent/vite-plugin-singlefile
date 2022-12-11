@@ -44,3 +44,4 @@
 | 2022-11-07 | 0.13.0        | Add deleteInlinedFiles option (#62, thanks @jaerod95!). Update dependencies.                   |
 | 2022-11-10 | 0.13.1        | Add node v14 support for non-Vue projects (#64, thanks @aloisklink! See also #60, #61)         |
 |            |               | Add CI testing via GitHub action (#65, thanks @aloisklink!)                                    |
+| 2022-12-10 | 0.13.2        | Confirmed compatibility with Rollup v3 and Vite v4, loosened package.json versions required    |
