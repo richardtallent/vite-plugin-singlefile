@@ -16,6 +16,8 @@ Web applications running from a local file have some browser security limitation
 - Limited state management options -- no cookies, no `localStorage`. However, you can use the new FileSystem API, with user permission.
 - Some web features that require a secure context may not be available.
 
+This Plugin does not support Multi-Page Apps (multiple HTML files)
+
 ## Installation
 
 ```shell
