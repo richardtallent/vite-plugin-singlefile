@@ -6,17 +6,20 @@ This Vite build plugin allows you to _inline_ all JavaScript and CSS resources d
 
 Bundling your _entire_ site into one file certainly isn't recommended for most situations.
 
-However, this can be very handy for _offline_ web applications--apps you can simply open the HTML file in your default web browser. This might include utilities, expert system tools, documentation, demos, and other situations where you want the full power of a web browser, without the need for a Cordova or Electron wrapper or the pain of normal application installation.
+In particular, this is not a good idea, performance-wise, for a normal web site hosted on a web server.
+
+However, this can be _very_ handy for _offline_ web applications-- apps bundled into a single HTML file that you can double-click and open directly in your web browser, no server needed. This might include utilities, expert system tools, documentation, demos, and other situations where you want the full power of a web browser, without the need for a Cordova or Electron wrapper or the pain of normal application installation.
 
 ## Limitations
 
 Web applications running from a local file have some browser security limitations:
 
 - No ability to access external domains -- no images, no API calls, etc.
-- Limited state management options -- no cookies, no `localStorage`. However, you can use the new FileSystem API, with user permission.
+- Limited state management options -- no cookies, no `localStorage`. However, you can use the FileSystem API, with user permission.
 - Some web features that require a secure context may not be available.
+- SPA routing requires using hash-based routes -- the web history API doesn't work for local files, and a web browser will not allow you to navigate between local HTML files.
 
-This Plugin does not support Multi-Page Apps (multiple HTML files)
+Last but not least, this is a **single file** plugin. As in, it creates **one HTML file**. Hence the name. So, this **will not work** with multi-page apps. Please see issue #51 for details.
 
 ## Installation
 
