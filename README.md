@@ -15,9 +15,10 @@ However, this can be _very_ handy for _offline_ web applications-- apps bundled 
 Web applications running from a local file have some browser security limitations:
 
 - No ability to access external domains -- no images, no API calls, etc.
-- Limited state management options -- no cookies, no `localStorage`. However, you can use the FileSystem API, with user permission.
-- Some web features that require a secure context may not be available.
+- `<link />`, `<script>`, `<img>`, CSS `url()`, or similar HTML/CSS/JS features that expect to make a request for another file will not work. This plugin gets around that by bundling as many of these as possible into the single file output.
+- No cookies. However, you can use `localStorage` and the newer experimental Persistent Storage APIs. You can also use the FileSystem API, with user permission.
 - SPA routing requires using hash-based routes -- the web history API doesn't work for local files, and a web browser will not allow you to navigate between local HTML files.
+- Any sourcemaps you generate will be useless, since this plugin bundles the compiled files after sourcemaps are generated. Turning off esbuild's minification in your vite config will at least ensure the code is legible when debugging.
 
 Last but not least, this is a **single file** plugin. As in, it creates **one HTML file**. Hence the name. So, this **will not work** with multi-page apps. Please see issue #51 for details.
 
