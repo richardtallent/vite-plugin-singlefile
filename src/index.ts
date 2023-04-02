@@ -95,12 +95,14 @@ export function viteSingleFile({
 }
 
 // Optionally remove the Vite module loader since it's no longer needed because this plugin has inlined all code.
-// This assumes that the Module Loader is (1) the FIRST function declared in the module, (2) an IIFE, (3) is minified,
-// (4) is within a script with no unexpected attribute values, and (5) that the containing script is the first script
-// tag that matches the above criteria. Changes to the SCRIPT tag especially could break this again in the future.
+// This assumes that the Module Loader is (1) the FIRST function declared in the module, (2) an IIFE, (4) is within
+// a script with no unexpected attribute values, and (5) that the containing script is the first script tag that
+// matches the above criteria. Changes to the SCRIPT tag especially could break this again in the future. It should
+// work whether `minify` is enabled or not.
 // Update example:
 // https://github.com/richardtallent/vite-plugin-singlefile/issues/57#issuecomment-1263950209
-const _removeViteModuleLoader = (html: string) => html.replace(/(<script type="module" crossorigin>\s*)\(function\(\)\{[\s\S]*?\}\)\(\);/, '<script type="module">\n')
+const _removeViteModuleLoader = (html: string) =>
+	html.replace(/(<script type="module" crossorigin>\s*)\(function(?: polyfill)?\(\)\s*\{[\s\S]*?\}\)\(\);/, '<script type="module">\n')
 
 // Modifies the Vite build config to make this plugin work well.
 const _useRecommendedBuildConfig = (config: UserConfig) => {

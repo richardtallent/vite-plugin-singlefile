@@ -46,3 +46,5 @@
 |            |               | Add CI testing via GitHub action (#65, thanks @aloisklink!)                                    |
 | 2022-12-10 | 0.13.2        | Confirmed compatibility with Rollup v3 and Vite v4, loosened package.json versions required    |
 | 2023-02-11 | 0.13.3        | Bump build dependencies, update README                                                         |
+| 2023-04-01 | 0.13.5        | Allow reporting of compressed bundle size (#70, #71, thanks @mojoaxel!)                        |
+|            |               | Fix where polfill not removed when minify disabled (#72)                                       |
