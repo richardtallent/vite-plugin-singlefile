@@ -111,8 +111,6 @@ const _useRecommendedBuildConfig = (config: UserConfig) => {
 	config.build.chunkSizeWarningLimit = 100000000
 	// Emit all CSS as a single file, which `vite-plugin-singlefile` can then inline.
 	config.build.cssCodeSplit = false
-	// Avoids the extra step of testing Brotli compression, which isn't really pertinent to a file served locally.
-	config.build.reportCompressedSize = false
 	// Subfolder bases are not supported, and shouldn't be needed because we're embedding everything.
 	config.base = undefined
 
