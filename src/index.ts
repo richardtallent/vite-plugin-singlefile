@@ -29,7 +29,7 @@ export function replaceScript(html: string, scriptFilename: string, scriptCode: 
 	// we can't use String.prototype.replaceAll since it isn't supported in Node.JS 14
 	const preloadMarker = /"__VITE_PRELOAD__"/g
 	const newCode = scriptCode.replace(preloadMarker, "void 0")
-	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>\n${newCode}\n</script>`)
+	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>\nimport "data:application/javascript;base64,${Buffer.from(newCode).toString("base64")}";\n</script>`)
 	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
 }
 
