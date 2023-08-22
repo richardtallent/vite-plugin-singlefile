@@ -34,8 +34,8 @@ export function replaceScript(html: string, scriptFilename: string, scriptCode: 
 }
 
 export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
-	const reCss = new RegExp(`<link[^>]*? href="[./]*${scriptFilename}"[^>]*?>`)
-	const inlined = html.replace(reCss, `<style>\n${scriptCode}\n</style>`)
+	const reStyle = new RegExp(`<link([^>]*?) href="[./]*${scriptFilename}"([^>]*?)>`)
+	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>\n${scriptCode}\n</style>`);
 	return inlined
 }
 
