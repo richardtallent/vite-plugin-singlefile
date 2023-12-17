@@ -81,7 +81,15 @@ generate a warning (same as any unrecognized assets).
 
 ### deleteInlinedFiles
 
-Defaults to `true`, which deletes all inlined files that were inlined. A use case for turning this to `false` would be if you would like sourcemaps to be generated so you can upload them to an error tracking platform like Sentry.io.
+Defaults to `true`, which deletes all inlined files that were inlined. A use case for turning this
+to `false` would be if you would like sourcemaps to be generated so you can upload them to an error
+tracking platform like Sentry.io.
+
+### collapseNewlines
+
+Defaults to `false`. `vite-plugin-singlefile` will inline assets in the `generateBundle` stage, during
+which it is too late to run any code minification plugins; setting this to `true` will trim leading
+and trailing newlines inserted while combining resources in a single file.
 
 ### Caveats
 

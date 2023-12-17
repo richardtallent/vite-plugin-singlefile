@@ -20,22 +20,34 @@ export type Config = {
 	//
 	// @default true
 	deleteInlinedFiles?: boolean
+	// Optionally, collapse leading and trailing newlines when inlining assets.
+	//
+	// @default false
+	collapseNewlines?: boolean
 }
 
-const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false, deleteInlinedFiles: true }
+const defaultConfig = {
+	useRecommendedBuildConfig: true,
+	removeViteModuleLoader: false,
+	deleteInlinedFiles: true,
+	collapseNewlines: false,
+}
 
-export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
+export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false, collapseNewlines = false): string {
 	const reScript = new RegExp(`<script([^>]*?) src="[./]*${scriptFilename}"([^>]*)></script>`)
 	// we can't use String.prototype.replaceAll since it isn't supported in Node.JS 14
+	let newCode = collapseNewlines ? scriptCode.trim() : `\n${scriptCode}\n`
 	const preloadMarker = /"__VITE_PRELOAD__"/g
-	const newCode = scriptCode.replace(preloadMarker, "void 0")
-	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>\n${newCode}\n</script>`)
-	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
+	newCode = newCode.replace(preloadMarker, "void 0")
+	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>${newCode}</script>`)
+	return removeViteModuleLoader ? _removeViteModuleLoader(inlined, collapseNewlines) : inlined
 }
 
-export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
+export function replaceCss(html: string, scriptFilename: string, scriptCode: string, collapseNewlines = false): string {
 	const reStyle = new RegExp(`<link([^>]*?) href="[./]*${scriptFilename}"([^>]*?)>`)
-	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>\n${scriptCode}\n</style>`);
+	const newCode = collapseNewlines ? scriptCode.trim() : `\n${scriptCode}\n`
+	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${newCode}</style>`)
+
 	return inlined
 }
 
@@ -46,6 +58,7 @@ export function viteSingleFile({
 	removeViteModuleLoader = false,
 	inlinePattern = [],
 	deleteInlinedFiles = true,
+	collapseNewlines = false,
 }: Config = defaultConfig): Plugin {
 	return {
 		name: "vite:singlefile",
@@ -65,7 +78,7 @@ export function viteSingleFile({
 						const jsChunk = bundle[jsName] as OutputChunk
 						if (jsChunk.code != null) {
 							bundlesToDelete.push(jsName)
-							replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader)
+							replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader, collapseNewlines)
 						}
 					} else {
 						warnNotInlined(jsName)
@@ -75,7 +88,7 @@ export function viteSingleFile({
 					if (!inlinePattern.length || micromatch.isMatch(cssName, inlinePattern)) {
 						const cssChunk = bundle[cssName] as OutputAsset
 						bundlesToDelete.push(cssName)
-						replacedHtml = replaceCss(replacedHtml, cssChunk.fileName, cssChunk.source as string)
+						replacedHtml = replaceCss(replacedHtml, cssChunk.fileName, cssChunk.source as string, collapseNewlines)
 					} else {
 						warnNotInlined(cssName)
 					}
@@ -101,8 +114,8 @@ export function viteSingleFile({
 // work whether `minify` is enabled or not.
 // Update example:
 // https://github.com/richardtallent/vite-plugin-singlefile/issues/57#issuecomment-1263950209
-const _removeViteModuleLoader = (html: string) =>
-	html.replace(/(<script type="module" crossorigin>\s*)\(function(?: polyfill)?\(\)\s*\{[\s\S]*?\}\)\(\);/, '<script type="module">\n')
+const _removeViteModuleLoader = (html: string, collapseNewlines = false) =>
+	html.replace(/(<script type="module" crossorigin>\s*)\(function(?: polyfill)?\(\)\s*\{[\s\S]*?\}\)\(\);/, `<script type="module">${collapseNewlines ? "" : "\n"}`)
 
 // Modifies the Vite build config to make this plugin work well.
 const _useRecommendedBuildConfig = (config: UserConfig) => {
