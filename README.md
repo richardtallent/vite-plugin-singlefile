@@ -85,7 +85,7 @@ Defaults to `true`, which deletes all inlined files that were inlined. A use cas
 
 ### Caveats
 
-- `favicon` resources are not inlined by Vite, and this plugin doesn't do that either.
+- Static resources in `public` folder (like `favicon`) are not inlined by Vite, and this plugin doesn't do that either. BUT the output single HTML file CAN work together with these resouces, using relative paths.
 - Inlining of SVG isn't supported directly by Vite, so it isn't supported directly here either. You'll need to use something like `https://github.com/jpkleemans/vite-svg-loader`, or put your SVG directly into the template.
 - There may be other situations where referenced files aren't inlined by Vite and aren't caught by this plugin either.
 - This is my first Vite and first Rollup plugin. I have no idea what I'm doing. PRs welcome.
