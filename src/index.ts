@@ -1,4 +1,4 @@
-import { UserConfig, Plugin } from "vite"
+import { UserConfig, PluginOption } from "vite"
 import { OutputChunk, OutputAsset, OutputOptions } from "rollup"
 import micromatch from "micromatch"
 
@@ -46,7 +46,7 @@ export function viteSingleFile({
 	removeViteModuleLoader = false,
 	inlinePattern = [],
 	deleteInlinedFiles = true,
-}: Config = defaultConfig): Plugin {
+}: Config = defaultConfig): PluginOption {
 	return {
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,

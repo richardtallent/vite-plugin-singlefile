@@ -20,7 +20,7 @@ Web applications running from a local file have some browser security limitation
 - SPA routing requires using hash-based routes -- the web history API doesn't work for local files, and a web browser will not allow you to navigate between local HTML files.
 - Any sourcemaps you generate will be useless, since this plugin bundles the compiled files after sourcemaps are generated. Turning off esbuild's minification in your vite config will at least ensure the code is legible when debugging.
 
-Last but not least, this is a **single file** plugin. As in, it creates **one HTML file**. Hence the name. So, this **will not work** with multi-page apps. Please see issue #51 for details.
+**This is a _single file_ plugin. As in, it creates _one HTML file_ and _no other files_. Hence the name. So, this _will not work_ with multi-page apps. Please see issue #51 for details. Issues opened requesting multiple entry points will be closed as `wontfix`.**
 
 ## Installation
 

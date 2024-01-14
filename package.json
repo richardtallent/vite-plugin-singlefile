@@ -1,8 +1,9 @@
 {
 	"name": "vite-plugin-singlefile",
-	"version": "0.13.5",
+	"version": "1.0.0",
 	"description": "Vite plugin for inlining JavaScript and CSS resources",
 	"main": "dist/cjs/index.js",
+	"type": "module",
 	"module": "dist/esm/index.js",
 	"exports": {
 		".": {
@@ -16,13 +17,14 @@
 		"dist"
 	],
 	"engines": {
-		"node": "^14.18.0 || >=16.0.0"
+		"node": ">18.0.0"
 	},
 	"scripts": {
 		"dev": "rimraf dist && tsc -w --p tsconfig.json",
 		"prepare": "npm run build",
 		"build": "rimraf dist && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
-		"test": "rimraf dist/cjs && tsc -p tsconfig-cjs.json && node --experimental-vm-modules ./node_modules/.bin/jest",
+		"test": "vitest",
+		"test:watch": "vitest watch",
 		"lint": "eslint src/index.ts"
 	},
 	"keywords": [
@@ -46,19 +48,19 @@
 		"micromatch": "^4.0.5"
 	},
 	"peerDependencies": {
-		"rollup": ">=2.79.0",
-		"vite": ">=3.2.0"
+		"rollup": "^4.9.5",
+		"vite": "^5.0.11"
 	},
 	"devDependencies": {
-		"@types/jest": "^29.5.0",
-		"@types/micromatch": "^4.0.2",
-		"@types/node": "^18.15.11",
-		"@typescript-eslint/eslint-plugin": "^5.57.0",
-		"@typescript-eslint/parser": "^5.57.0",
-		"eslint": "^8.37.0",
-		"jest": "^29.5.0",
-		"rimraf": "^4.4.1",
-		"typescript": "^5.0.3"
+		"@types/jest": "^29.5.11",
+		"@types/micromatch": "^4.0.6",
+		"@types/node": "^18.0.0",
+		"@typescript-eslint/eslint-plugin": "^6.18.1",
+		"@typescript-eslint/parser": "^6.18.1",
+		"eslint": "^8.56.0",
+		"vitest": "^1.2.0",
+		"rimraf": "^5.0.5",
+		"typescript": "^5.3.3"
 	},
 	"prettier": {
 		"useTabs": true,
