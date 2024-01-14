@@ -113,8 +113,12 @@ const _useRecommendedBuildConfig = (config: UserConfig) => {
 	config.build.chunkSizeWarningLimit = 100000000
 	// Emit all CSS as a single file, which `vite-plugin-singlefile` can then inline.
 	config.build.cssCodeSplit = false
-	// Subfolder bases are not supported, and shouldn't be needed because we're embedding everything.
-	config.base = undefined
+	// We need relative path to support any static files in public folder,
+	// which are copied to ${build.outDir} by vite.
+	config.base = './'
+	// Make generated files in ${build.outDir}'s root, instead of default ${build.outDir}/assets.
+	// Then the embedded resources can be loaded by relative path.
+    config.build.assetsDir = ''
 
 	if (!config.build.rollupOptions) config.build.rollupOptions = {}
 	if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
