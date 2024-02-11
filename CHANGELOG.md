@@ -48,7 +48,12 @@
 | 2023-02-11 | 0.13.3        | Bump build dependencies, update README                                                         |
 | 2023-04-01 | 0.13.5        | Allow reporting of compressed bundle size (#70, #71, thanks @mojoaxel!)                        |
 |            |               | Fix where polfill not removed when minify disabled (#72)                                       |
-| 2024-01-14 | 1.0.0         | Vite 5, Node 18 is now required. This is a breaking change!                                    |
+| 2024-01-14 | 1.0.0         | BREAKING: Vite 5, Node 18 is now required. This is a breaking change!                          |
 |            |               | Fixed relative URLs (#75, #86, thanks @atomiechen!)                                            |
 |            |               | Switched from jest to vitest                                                                   |
 |            |               | Fix plugin type                                                                                |
+| 2024-02-11 | 2.0.0         | BREAKING: Vite 5.1+ is now required                                                            |
+|            |               | Uses delegate for `assetsInlineLimit`                                                          |
+|            |               | Removed unneeded `\n` around `<style>` and `<script>` tags (only needed w/CDATA) (#85)         |
+|            |               | More detailed output                                                                           |
+|            |               | Legacy UTF-8 charset declarations are now removed from inlined CSS files (#90)                 |

@@ -1,7 +1,7 @@
 {
 	"name": "vite-plugin-singlefile",
-	"version": "1.0.0",
-	"description": "Vite plugin for inlining JavaScript and CSS resources",
+	"version": "2.0.0",
+	"description": "Vite plugin for inlining all JavaScript and CSS resources",
 	"main": "dist/cjs/index.js",
 	"type": "module",
 	"module": "dist/esm/index.js",
@@ -48,17 +48,17 @@
 		"micromatch": "^4.0.5"
 	},
 	"peerDependencies": {
-		"rollup": "^4.9.5",
-		"vite": "^5.0.11"
+		"rollup": "^4.10.0",
+		"vite": "^5.1.1"
 	},
 	"devDependencies": {
-		"@types/jest": "^29.5.11",
+		"@types/jest": "^29.5.12",
 		"@types/micromatch": "^4.0.6",
-		"@types/node": "^18.0.0",
-		"@typescript-eslint/eslint-plugin": "^6.18.1",
-		"@typescript-eslint/parser": "^6.18.1",
+		"@types/node": "^20.11.17",
+		"@typescript-eslint/eslint-plugin": "^6.21.0",
+		"@typescript-eslint/parser": "^6.21.0",
 		"eslint": "^8.56.0",
-		"vitest": "^1.2.0",
+		"vitest": "^1.2.2",
 		"rimraf": "^5.0.5",
 		"typescript": "^5.3.3"
 	},

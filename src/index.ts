@@ -29,17 +29,20 @@ export function replaceScript(html: string, scriptFilename: string, scriptCode: 
 	// we can't use String.prototype.replaceAll since it isn't supported in Node.JS 14
 	const preloadMarker = /"__VITE_PRELOAD__"/g
 	const newCode = scriptCode.replace(preloadMarker, "void 0")
-	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>\n${newCode}\n</script>`)
+	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>${newCode}</script>`)
 	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
 }
 
 export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
 	const reStyle = new RegExp(`<link([^>]*?) href="[./]*${scriptFilename}"([^>]*?)>`)
-	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>\n${scriptCode}\n</style>`);
+	const legacyCharSetDeclaration = /@charset "UTF-8";/
+	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${scriptCode.replace(legacyCharSetDeclaration, "")}</style>`);
 	return inlined
 }
 
-const warnNotInlined = (filename: string) => console.warn(`WARNING: asset not inlined: ${filename}`)
+const isJsFile = /\.[mc]?js$/
+const isCssFile = /\.css$/
+const isHtmlFile = /\.html?$/
 
 export function viteSingleFile({
 	useRecommendedBuildConfig = true,
@@ -47,38 +50,59 @@ export function viteSingleFile({
 	inlinePattern = [],
 	deleteInlinedFiles = true,
 }: Config = defaultConfig): PluginOption {
+
+	function warnNotInlined(filename: string) {
+		console.debug(`NOTE: asset not inlined: ${filename}`)
+	}
+
 	return {
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
 		enforce: "post",
 		generateBundle: (_, bundle) => {
-			const jsExtensionTest = /\.[mc]?js$/
-			const htmlFiles = Object.keys(bundle).filter((i) => i.endsWith(".html"))
-			const cssAssets = Object.keys(bundle).filter((i) => i.endsWith(".css"))
-			const jsAssets = Object.keys(bundle).filter((i) => jsExtensionTest.test(i))
+			console.debug("\n")
+			const files = {
+				html: [] as string[],
+				css: [] as string[],
+				js: [] as string[],
+				other: [] as string[]
+			}
+			for (const i of Object.keys(bundle)) {
+				if (isHtmlFile.test(i)) {
+					files.html.push(i)
+				} else if (isCssFile.test(i)) {
+					files.css.push(i)
+				} else if (isJsFile.test(i)) {
+					files.js.push(i)
+				} else {
+					files.other.push(i)
+				}
+			}
 			const bundlesToDelete = [] as string[]
-			for (const name of htmlFiles) {
+			for (const name of files.html) {
 				const htmlChunk = bundle[name] as OutputAsset
 				let replacedHtml = htmlChunk.source as string
-				for (const jsName of jsAssets) {
-					if (!inlinePattern.length || micromatch.isMatch(jsName, inlinePattern)) {
-						const jsChunk = bundle[jsName] as OutputChunk
-						if (jsChunk.code != null) {
-							bundlesToDelete.push(jsName)
-							replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader)
-						}
-					} else {
-						warnNotInlined(jsName)
+				for (const filename of files.js) {
+					if (inlinePattern.length && !micromatch.isMatch(filename, inlinePattern)) {
+						warnNotInlined(filename)
+						continue
+					}
+					const jsChunk = bundle[filename] as OutputChunk
+					if (jsChunk.code != null) {
+						console.debug(`Inlining: ${filename}`)
+						bundlesToDelete.push(filename)
+						replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader)
 					}
 				}
-				for (const cssName of cssAssets) {
-					if (!inlinePattern.length || micromatch.isMatch(cssName, inlinePattern)) {
-						const cssChunk = bundle[cssName] as OutputAsset
-						bundlesToDelete.push(cssName)
-						replacedHtml = replaceCss(replacedHtml, cssChunk.fileName, cssChunk.source as string)
-					} else {
-						warnNotInlined(cssName)
+				for (const filename of files.css) {
+					if (inlinePattern.length && !micromatch.isMatch(filename, inlinePattern)) {
+						warnNotInlined(filename)
+						continue
 					}
+					const cssChunk = bundle[filename] as OutputAsset
+					console.debug(`Inlining: ${filename}`)
+					bundlesToDelete.push(filename)
+					replacedHtml = replaceCss(replacedHtml, cssChunk.fileName, cssChunk.source as string)
 				}
 				htmlChunk.source = replacedHtml
 			}
@@ -87,7 +111,7 @@ export function viteSingleFile({
 					delete bundle[name]
 				}
 			}
-			for (const name of Object.keys(bundle).filter((i) => !jsExtensionTest.test(i) && !i.endsWith(".css") && !i.endsWith(".html"))) {
+			for (const name of files.other) {
 				warnNotInlined(name)
 			}
 		},
@@ -102,13 +126,13 @@ export function viteSingleFile({
 // Update example:
 // https://github.com/richardtallent/vite-plugin-singlefile/issues/57#issuecomment-1263950209
 const _removeViteModuleLoader = (html: string) =>
-	html.replace(/(<script type="module" crossorigin>\s*)\(function(?: polyfill)?\(\)\s*\{[\s\S]*?\}\)\(\);/, '<script type="module">\n')
+	html.replace(/(<script type="module" crossorigin>\s*)\(function(?: polyfill)?\(\)\s*\{[\s\S]*?\}\)\(\);/, '<script type="module">')
 
 // Modifies the Vite build config to make this plugin work well.
 const _useRecommendedBuildConfig = (config: UserConfig) => {
 	if (!config.build) config.build = {}
 	// Ensures that even very large assets are inlined in your JavaScript.
-	config.build.assetsInlineLimit = 100000000
+	config.build.assetsInlineLimit = () => true
 	// Avoid warnings about large chunks.
 	config.build.chunkSizeWarningLimit = 100000000
 	// Emit all CSS as a single file, which `vite-plugin-singlefile` can then inline.
@@ -118,7 +142,7 @@ const _useRecommendedBuildConfig = (config: UserConfig) => {
 	config.base = './'
 	// Make generated files in ${build.outDir}'s root, instead of default ${build.outDir}/assets.
 	// Then the embedded resources can be loaded by relative path.
-    config.build.assetsDir = ''
+	config.build.assetsDir = ''
 
 	if (!config.build.rollupOptions) config.build.rollupOptions = {}
 	if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}

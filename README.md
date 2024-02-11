@@ -4,23 +4,40 @@ This Vite build plugin allows you to _inline_ all JavaScript and CSS resources d
 
 ## Why?
 
-Bundling your _entire_ site into one file certainly isn't recommended for most situations.
+Bundling your _entire_ site into one file **isn't recommended for most situations**.
 
-In particular, this is not a good idea, performance-wise, for a normal web site hosted on a web server.
+In particular, this is not a good idea, performance-wise, for hosting a site on a normal web server.
 
 However, this can be _very_ handy for _offline_ web applications-- apps bundled into a single HTML file that you can double-click and open directly in your web browser, no server needed. This might include utilities, expert system tools, documentation, demos, and other situations where you want the full power of a web browser, without the need for a Cordova or Electron wrapper or the pain of normal application installation.
 
-## Limitations
+**This is a _single file_ plugin. As in, it creates _one HTML file_ and _no other files_. Hence the name. So, this either _will not work_ or _will not be optimized for_ apps that require multiple "entry points" (HTML files). Please see issue #51 for details. Issues opened requesting multiple entry points will be closed as `wontfix`.**
 
-Web applications running from a local file have some browser security limitations:
+## What does work when running an HTML file locally
 
-- No ability to access external domains -- no images, no API calls, etc.
-- `<link />`, `<script>`, `<img>`, CSS `url()`, or similar HTML/CSS/JS features that expect to make a request for another file will not work. This plugin gets around that by bundling as many of these as possible into the single file output.
-- No cookies. However, you can use `localStorage` and the newer experimental Persistent Storage APIs. You can also use the FileSystem API, with user permission.
-- SPA routing requires using hash-based routes -- the web history API doesn't work for local files, and a web browser will not allow you to navigate between local HTML files.
-- Any sourcemaps you generate will be useless, since this plugin bundles the compiled files after sourcemaps are generated. Turning off esbuild's minification in your vite config will at least ensure the code is legible when debugging.
+Local HTML files are now for most purposes considered to be a "secure context" and thus now have far more capabilities than when this project started, which is good!
 
-**This is a _single file_ plugin. As in, it creates _one HTML file_ and _no other files_. Hence the name. So, this _will not work_ with multi-page apps. Please see issue #51 for details. Issues opened requesting multiple entry points will be closed as `wontfix`.**
+You can use:
+
+- `localStorage`
+- Newer experimental Persistent Storage APIs
+- FileSystem API
+- Requests for _local files_ relative to the same folder (_i.e._, for Vue, resources from your `public` folder)
+- Requests for images from external web sites
+- Requests for fonts from external web sites
+- Requests to external APIs (requires `{ mode: 'no-cors'}` in your `fetch` call)
+- Following links to other files relative to the same folder
+- SPA hash-based routing
+- WebXR
+
+_I've only tested some of the above in Chromium-based browsers. YMMV for WebKit and other browser engines. Some may require explicit user permission._
+
+## What doesn't work
+
+- SPA routing via Web History API
+- Cookies (passed via HTTP headers, which don't exist for `file:///` URIs)
+- WebXR Immersive Mode (theoretically could work, but not currently supported)
+- Worklets (theoretically could work, but not currently supported)
+- Sourcemaps (useless, since inlining happens after they are generated)
 
 ## Installation
 
