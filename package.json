@@ -20,9 +20,9 @@
 		"node": ">18.0.0"
 	},
 	"scripts": {
-		"dev": "rimraf dist && tsc -w --p tsconfig.json",
+		"dev": "rimraf dist && tsc -w -p tsconfig.json",
 		"prepare": "npm run build",
-		"build": "rimraf dist && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
+		"build": "rimraf dist && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && node fixup.cjs",
 		"test": "vitest",
 		"test:watch": "vitest watch",
 		"lint": "eslint src/index.ts"
@@ -58,9 +58,9 @@
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
 		"@typescript-eslint/parser": "^6.21.0",
 		"eslint": "^8.56.0",
-		"vitest": "^1.2.2",
 		"rimraf": "^5.0.5",
-		"typescript": "^5.3.3"
+		"typescript": "^5.3.3",
+		"vitest": "^1.2.2"
 	},
 	"prettier": {
 		"useTabs": true,
