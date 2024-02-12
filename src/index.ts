@@ -26,17 +26,15 @@ const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader:
 
 export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
 	const reScript = new RegExp(`<script([^>]*?) src="[./]*${scriptFilename}"([^>]*)></script>`)
-	// we can't use String.prototype.replaceAll since it isn't supported in Node.JS 14
-	const preloadMarker = /"__VITE_PRELOAD__"/g
-	const newCode = scriptCode.replace(preloadMarker, "void 0")
+	const newCode = scriptCode.replaceAll(`"__VITE_PRELOAD__"`, "void 0")
 	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>${newCode}</script>`)
 	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
 }
 
 export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
 	const reStyle = new RegExp(`<link([^>]*?) href="[./]*${scriptFilename}"([^>]*?)>`)
-	const legacyCharSetDeclaration = /@charset "UTF-8";/
-	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${scriptCode.replace(legacyCharSetDeclaration, "")}</style>`);
+	const newCode = scriptCode.replace(`@charset "UTF-8";`, "")
+	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${newCode}</style>`);
 	return inlined
 }
 
