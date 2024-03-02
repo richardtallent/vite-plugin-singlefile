@@ -153,7 +153,7 @@ const _useRecommendedBuildConfig = (config: UserConfig) => {
 	}
 
 	if (Array.isArray(config.build.rollupOptions.output)) {
-		for (const o in config.build.rollupOptions.output) updateOutputOptions(o as OutputOptions)
+		for (const o of config.build.rollupOptions.output) updateOutputOptions(o as OutputOptions)
 	} else {
 		updateOutputOptions(config.build.rollupOptions.output as OutputOptions)
 	}
