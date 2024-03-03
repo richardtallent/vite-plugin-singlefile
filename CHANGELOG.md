@@ -57,3 +57,4 @@
 |            |               | Removed unneeded `\n` around `<style>` and `<script>` tags (only needed w/CDATA) (#85)         |
 |            |               | More detailed output                                                                           |
 |            |               | Legacy UTF-8 charset declarations are now removed from inlined CSS files (#90)                 |
+| 2024-03-03 | 2.0.1         | Fix array issue (#93, thanks @smac89!). Bump dependencies.                                     |
