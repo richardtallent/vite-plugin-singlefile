@@ -20,6 +20,10 @@ export type Config = {
 	//
 	// @default true
 	deleteInlinedFiles?: boolean
+	// Optionally, only inline JavaScript files.
+	//
+	// @default false
+	jsOnly?: boolean
 }
 
 const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false, deleteInlinedFiles: true }
@@ -36,7 +40,7 @@ export function replaceScript(html: string, scriptFilename: string, scriptCode: 
 export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
 	const reStyle = new RegExp(`<link([^>]*?) href="[./]*${scriptFilename}"([^>]*?)>`)
 	const legacyCharSetDeclaration = /@charset "UTF-8";/
-	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${scriptCode.replace(legacyCharSetDeclaration, "")}</style>`);
+	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${scriptCode.replace(legacyCharSetDeclaration, "")}</style>`)
 	return inlined
 }
 
@@ -49,8 +53,8 @@ export function viteSingleFile({
 	removeViteModuleLoader = false,
 	inlinePattern = [],
 	deleteInlinedFiles = true,
+	jsOnly = false,
 }: Config = defaultConfig): PluginOption {
-
 	function warnNotInlined(filename: string) {
 		console.debug(`NOTE: asset not inlined: ${filename}`)
 	}
@@ -65,7 +69,7 @@ export function viteSingleFile({
 				html: [] as string[],
 				css: [] as string[],
 				js: [] as string[],
-				other: [] as string[]
+				other: [] as string[],
 			}
 			for (const i of Object.keys(bundle)) {
 				if (isHtmlFile.test(i)) {
@@ -94,17 +98,21 @@ export function viteSingleFile({
 						replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader)
 					}
 				}
-				for (const filename of files.css) {
-					if (inlinePattern.length && !micromatch.isMatch(filename, inlinePattern)) {
-						warnNotInlined(filename)
-						continue
+				if (jsOnly) {
+					htmlChunk.source = replacedHtml
+				} else {
+					for (const filename of files.css) {
+						if (inlinePattern.length && !micromatch.isMatch(filename, inlinePattern)) {
+							warnNotInlined(filename)
+							continue
+						}
+						const cssChunk = bundle[filename] as OutputAsset
+						console.debug(`Inlining: ${filename}`)
+						bundlesToDelete.push(filename)
+						replacedHtml = replaceCss(replacedHtml, cssChunk.fileName, cssChunk.source as string)
 					}
-					const cssChunk = bundle[filename] as OutputAsset
-					console.debug(`Inlining: ${filename}`)
-					bundlesToDelete.push(filename)
-					replacedHtml = replaceCss(replacedHtml, cssChunk.fileName, cssChunk.source as string)
+					htmlChunk.source = replacedHtml
 				}
-				htmlChunk.source = replacedHtml
 			}
 			if (deleteInlinedFiles) {
 				for (const name of bundlesToDelete) {
@@ -139,10 +147,10 @@ const _useRecommendedBuildConfig = (config: UserConfig) => {
 	config.build.cssCodeSplit = false
 	// We need relative path to support any static files in public folder,
 	// which are copied to ${build.outDir} by vite.
-	config.base = './'
+	config.base = "./"
 	// Make generated files in ${build.outDir}'s root, instead of default ${build.outDir}/assets.
 	// Then the embedded resources can be loaded by relative path.
-	config.build.assetsDir = ''
+	config.build.assetsDir = ""
 
 	if (!config.build.rollupOptions) config.build.rollupOptions = {}
 	if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
