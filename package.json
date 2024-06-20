@@ -1,6 +1,6 @@
 {
 	"name": "vite-plugin-singlefile",
-	"version": "2.0.1",
+	"version": "2.0.2",
 	"description": "Vite plugin for inlining all JavaScript and CSS resources",
 	"main": "dist/cjs/index.js",
 	"type": "module",
@@ -45,22 +45,22 @@
 	},
 	"homepage": "https://github.com/richardtallent/vite-plugin-singlefile/tree/main/#readme",
 	"dependencies": {
-		"micromatch": "^4.0.5"
+		"micromatch": "^4.0.7"
 	},
 	"peerDependencies": {
-		"rollup": "^4.12.0",
-		"vite": "^5.1.4"
+		"rollup": "^4.18.0",
+		"vite": "^5.3.1"
 	},
 	"devDependencies": {
 		"@types/jest": "^29.5.12",
-		"@types/micromatch": "^4.0.6",
-		"@types/node": "^20.11.24",
-		"@typescript-eslint/eslint-plugin": "^7.1.0",
-		"@typescript-eslint/parser": "^7.1.0",
+		"@types/micromatch": "^4.0.7",
+		"@types/node": "^20.14.6",
+		"@typescript-eslint/eslint-plugin": "^7.13.1",
+		"@typescript-eslint/parser": "^7.13.1",
 		"eslint": "^8.57.0",
-		"vitest": "^1.3.1",
-		"rimraf": "^5.0.5",
-		"typescript": "^5.3.3"
+		"vitest": "^1.6.0",
+		"rimraf": "^5.0.7",
+		"typescript": "^5.4.5"
 	},
 	"prettier": {
 		"useTabs": true,

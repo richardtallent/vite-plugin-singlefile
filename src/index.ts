@@ -26,7 +26,6 @@ const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader:
 
 export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
 	const reScript = new RegExp(`<script([^>]*?) src="[./]*${scriptFilename}"([^>]*)></script>`)
-	// we can't use String.prototype.replaceAll since it isn't supported in Node.JS 14
 	const preloadMarker = /"?__VITE_PRELOAD__"?/g
 	const newCode = scriptCode.replace(preloadMarker, "void 0")
 	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>${newCode}</script>`)
