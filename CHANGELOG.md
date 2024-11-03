@@ -59,3 +59,4 @@
 |            |               | Legacy UTF-8 charset declarations are now removed from inlined CSS files (#90)                 |
 | 2024-03-03 | 2.0.1         | Fix array issue (#93, thanks @smac89!). Bump dependencies.                                     |
 | 2024-06-19 | 2.0.2         | Yet another fix for Preload marker removal, due to Vite 5.3 (#98).                             |
+| 2024-11-03 | 2.0.3         | Fix inlined script/comment tags (#102)                                                         |

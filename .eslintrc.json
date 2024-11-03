@@ -10,5 +10,17 @@
 		"sourceType": "module"
 	},
 	"plugins": ["@typescript-eslint"],
-	"rules": {}
+	"rules": {},
+	"overrides": [
+		{
+			"files": ["*.cjs"],
+			"parserOptions": {
+				"sourceType": "script"
+			},
+			"rules": {
+				"@typescript-eslint/no-var-requires": "off",
+				"import/no-commonjs": "off"
+			}
+		}
+	]
 }
