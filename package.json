@@ -20,9 +20,9 @@
 		"node": ">18.0.0"
 	},
 	"scripts": {
-		"dev": "rimraf dist && tsc -w --p tsconfig.json",
+		"dev": "rimraf dist && tsc -w -p tsconfig.json",
 		"prepare": "npm run build",
-		"build": "rimraf dist && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
+		"build": "rimraf dist && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && node fixup.cjs",
 		"test": "vitest",
 		"test:watch": "vitest watch",
 		"lint": "eslint src/index.ts"

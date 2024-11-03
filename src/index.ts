@@ -28,14 +28,14 @@ export function replaceScript(html: string, scriptFilename: string, scriptCode: 
 	const reScript = new RegExp(`<script([^>]*?) src="[./]*${scriptFilename}"([^>]*)></script>`)
 	const preloadMarker = /"?__VITE_PRELOAD__"?/g
 	const newCode = scriptCode.replace(preloadMarker, "void 0").replace(/(<)(\/script>|!--)/g, '\\x3C$2')
-	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>${newCode}</script>`)
+	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>${newCode.trim()}</script>`)
 	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
 }
 
 export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
 	const reStyle = new RegExp(`<link([^>]*?) href="[./]*${scriptFilename}"([^>]*?)>`)
-	const legacyCharSetDeclaration = /@charset "UTF-8";/
-	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${scriptCode.replace(legacyCharSetDeclaration, "")}</style>`);
+	const newCode = scriptCode.replace(`@charset "UTF-8";`, "")
+	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${newCode.trim()}</style>`);
 	return inlined
 }
 
