@@ -60,3 +60,6 @@
 | 2024-03-03 | 2.0.1         | Fix array issue (#93, thanks @smac89!). Bump dependencies.                                     |
 | 2024-06-19 | 2.0.2         | Yet another fix for Preload marker removal, due to Vite 5.3 (#98).                             |
 | 2024-11-03 | 2.0.3         | Fix inlined script/comment tags (#102)                                                         |
+| 2024-12-08 | 2.1.0         | Allow for Vite 6                                                                               |
+|            |               | Note that as of the release date, you'll need vitest 3.0.0-beta.1 to test with vite 6, and     |
+|            |               | part of it has a depenency on vite 5 still, so you may have to force vite 6.                   |
