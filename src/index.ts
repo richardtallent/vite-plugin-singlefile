@@ -25,17 +25,19 @@ export type Config = {
 const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false, deleteInlinedFiles: true }
 
 export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
-	const reScript = new RegExp(`<script([^>]*?) src="(.*)?${scriptFilename}"([^>]*)></script>`)
+	const f = scriptFilename.replaceAll(".", "\\.")
+	const reScript = new RegExp(`<script([^>]*?) src="(?:[^"]*?/)?${f}"([^>]*)></script>`)
 	const preloadMarker = /"?__VITE_PRELOAD__"?/g
 	const newCode = scriptCode.replace(preloadMarker, "void 0").replace(/<(\/script>|!--)/g, '\\x3C$1')
-	const inlined = html.replace(reScript, (_, beforeSrc, _base, afterSrc) => `<script${beforeSrc}${afterSrc}>${newCode.trim()}</script>`)
+	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>${newCode.trim()}</script>`)
 	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
 }
 
 export function replaceCss(html: string, scriptFilename: string, scriptCode: string): string {
-	const reStyle = new RegExp(`<link([^>]*?) href="(.*)?${scriptFilename}"([^>]*?)>`)
+	const f = scriptFilename.replaceAll(".", "\\.")
+	const reStyle = new RegExp(`<link([^>]*?) href="(?:[^"]*?/)?${f}"([^>]*)>`)
 	const newCode = scriptCode.replace(`@charset "UTF-8";`, "")
-	const inlined = html.replace(reStyle, (_, beforeSrc, _base, afterSrc) => `<style${beforeSrc}${afterSrc}>${newCode.trim()}</style>`);
+	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${newCode.trim()}</style>`);
 	return inlined
 }
 
