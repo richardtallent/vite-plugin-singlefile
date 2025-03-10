@@ -49,17 +49,13 @@ export function viteSingleFile({
 	inlinePattern = [],
 	deleteInlinedFiles = true,
 }: Config = defaultConfig): PluginOption {
-
-	function warnNotInlined(filename: string) {
-		console.debug(`NOTE: asset not inlined: ${filename}`)
-	}
-
 	return {
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
 		enforce: "post",
-		generateBundle: (_, bundle) => {
-			console.debug("\n")
+		generateBundle(_, bundle) {
+			const warnNotInlined = ( filename: string ) => this.info( `NOTE: asset not inlined: ${ filename }` )
+			this.info("\n")
 			const files = {
 				html: [] as string[],
 				css: [] as string[],
@@ -88,7 +84,7 @@ export function viteSingleFile({
 					}
 					const jsChunk = bundle[filename] as OutputChunk
 					if (jsChunk.code != null) {
-						console.debug(`Inlining: ${filename}`)
+						this.info(`Inlining: ${filename}`)
 						bundlesToDelete.push(filename)
 						replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader)
 					}
@@ -99,7 +95,7 @@ export function viteSingleFile({
 						continue
 					}
 					const cssChunk = bundle[filename] as OutputAsset
-					console.debug(`Inlining: ${filename}`)
+					this.info(`Inlining: ${filename}`)
 					bundlesToDelete.push(filename)
 					replacedHtml = replaceCss(replacedHtml, cssChunk.fileName, cssChunk.source as string)
 				}
