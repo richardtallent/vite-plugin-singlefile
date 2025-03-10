@@ -63,3 +63,5 @@
 | 2024-12-08 | 2.1.0         | Allow for Vite 6                                                                               |
 |            |               | Note that as of the release date, you'll need vitest 3.0.0-beta.1 to test with vite 6, and     |
 |            |               | part of it has a depenency on vite 5 still, so you may have to force vite 6.                   |
+| 2025-03-09 | 2.2.0         | Respect Vite logging level (#107)                                                              |
+|            |               | Respect Vite base option (#103)                                                                |
