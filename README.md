@@ -100,6 +100,10 @@ generate a warning (same as any unrecognized assets).
 
 Defaults to `true`, which deletes all inlined files that were inlined. A use case for turning this to `false` would be if you would like sourcemaps to be generated so you can upload them to an error tracking platform like Sentry.io.
 
+### overrideConfig
+
+The recommended configuration really is recommended, but if you need to tweak something it is doing, you can put your own partial rollup configuration in this object to override this plugin's defaults. For example, the default base URL for public non-inlined files is "./", but if you need it to be absolute, you can use `overrideConfig: { base: "/" }` to set it.
+
 ### Caveats
 
 - Static resources in `public` folder (like `favicon`) are not inlined by Vite, and this plugin doesn't do that either. BUT the output single HTML file CAN work together with these resouces, using relative paths.

@@ -66,3 +66,4 @@
 | 2025-03-09 | 2.2.0         | Respect Vite logging level (#107)                                                              |
 |            |               | Respect Vite base option (#103)                                                                |
 | 2025-07-01 | 2.2.1         | Allow for Vite 7, bump other dependencies.                                                     |
+| 2025-07-01 | 2.3.0         | Add config option `overrideConfig` to override recommended configuration (#109)                |

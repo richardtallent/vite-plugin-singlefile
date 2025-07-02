@@ -20,6 +20,10 @@ export type Config = {
 	//
 	// @default true
 	deleteInlinedFiles?: boolean
+	// If you need to override anything specific in the recommended build config, pass a sparse
+	// object here. For example, use `{ base: "/" }` to override the default "./" base path for
+	// non-inlined public files.
+	overrideConfig?: Partial<UserConfig>
 }
 
 const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false, deleteInlinedFiles: true }
@@ -28,7 +32,7 @@ export function replaceScript(html: string, scriptFilename: string, scriptCode: 
 	const f = scriptFilename.replaceAll(".", "\\.")
 	const reScript = new RegExp(`<script([^>]*?) src="(?:[^"]*?/)?${f}"([^>]*)></script>`)
 	const preloadMarker = /"?__VITE_PRELOAD__"?/g
-	const newCode = scriptCode.replace(preloadMarker, "void 0").replace(/<(\/script>|!--)/g, '\\x3C$1')
+	const newCode = scriptCode.replace(preloadMarker, "void 0").replace(/<(\/script>|!--)/g, "\\x3C$1")
 	const inlined = html.replace(reScript, (_, beforeSrc, afterSrc) => `<script${beforeSrc}${afterSrc}>${newCode.trim()}</script>`)
 	return removeViteModuleLoader ? _removeViteModuleLoader(inlined) : inlined
 }
@@ -37,7 +41,7 @@ export function replaceCss(html: string, scriptFilename: string, scriptCode: str
 	const f = scriptFilename.replaceAll(".", "\\.")
 	const reStyle = new RegExp(`<link([^>]*?) href="(?:[^"]*?/)?${f}"([^>]*)>`)
 	const newCode = scriptCode.replace(`@charset "UTF-8";`, "")
-	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${newCode.trim()}</style>`);
+	const inlined = html.replace(reStyle, (_, beforeSrc, afterSrc) => `<style${beforeSrc}${afterSrc}>${newCode.trim()}</style>`)
 	return inlined
 }
 
@@ -50,19 +54,53 @@ export function viteSingleFile({
 	removeViteModuleLoader = false,
 	inlinePattern = [],
 	deleteInlinedFiles = true,
+	overrideConfig = {},
 }: Config = defaultConfig): PluginOption {
+	// Modifies the Vite build config to make this plugin work well.
+	const _useRecommendedBuildConfig = (config: UserConfig) => {
+		if (!config.build) config.build = {}
+		// Ensures that even very large assets are inlined in your JavaScript.
+		config.build.assetsInlineLimit = () => true
+		// Avoid warnings about large chunks.
+		config.build.chunkSizeWarningLimit = 100000000
+		// Emit all CSS as a single file, which `vite-plugin-singlefile` can then inline.
+		config.build.cssCodeSplit = false
+		// We need relative path to support any static files in public folder,
+		// which are copied to ${build.outDir} by vite.
+		config.base = "./"
+		// Make generated files in ${build.outDir}'s root, instead of default ${build.outDir}/assets.
+		// Then the embedded resources can be loaded by relative path.
+		config.build.assetsDir = ""
+
+		if (!config.build.rollupOptions) config.build.rollupOptions = {}
+		if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
+
+		const updateOutputOptions = (out: OutputOptions) => {
+			// Ensure that as many resources as possible are inlined.
+			out.inlineDynamicImports = true
+		}
+
+		if (Array.isArray(config.build.rollupOptions.output)) {
+			for (const o of config.build.rollupOptions.output) updateOutputOptions(o as OutputOptions)
+		} else {
+			updateOutputOptions(config.build.rollupOptions.output as OutputOptions)
+		}
+
+		Object.assign(config, overrideConfig)
+	}
+
 	return {
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
 		enforce: "post",
 		generateBundle(_, bundle) {
-			const warnNotInlined = ( filename: string ) => this.info( `NOTE: asset not inlined: ${ filename }` )
+			const warnNotInlined = (filename: string) => this.info(`NOTE: asset not inlined: ${filename}`)
 			this.info("\n")
 			const files = {
 				html: [] as string[],
 				css: [] as string[],
 				js: [] as string[],
-				other: [] as string[]
+				other: [] as string[],
 			}
 			for (const i of Object.keys(bundle)) {
 				if (isHtmlFile.test(i)) {
@@ -124,34 +162,3 @@ export function viteSingleFile({
 // https://github.com/richardtallent/vite-plugin-singlefile/issues/57#issuecomment-1263950209
 const _removeViteModuleLoader = (html: string) =>
 	html.replace(/(<script type="module" crossorigin>\s*)\(function(?: polyfill)?\(\)\s*\{[\s\S]*?\}\)\(\);/, '<script type="module">')
-
-// Modifies the Vite build config to make this plugin work well.
-const _useRecommendedBuildConfig = (config: UserConfig) => {
-	if (!config.build) config.build = {}
-	// Ensures that even very large assets are inlined in your JavaScript.
-	config.build.assetsInlineLimit = () => true
-	// Avoid warnings about large chunks.
-	config.build.chunkSizeWarningLimit = 100000000
-	// Emit all CSS as a single file, which `vite-plugin-singlefile` can then inline.
-	config.build.cssCodeSplit = false
-	// We need relative path to support any static files in public folder,
-	// which are copied to ${build.outDir} by vite.
-	config.base = './'
-	// Make generated files in ${build.outDir}'s root, instead of default ${build.outDir}/assets.
-	// Then the embedded resources can be loaded by relative path.
-	config.build.assetsDir = ''
-
-	if (!config.build.rollupOptions) config.build.rollupOptions = {}
-	if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
-
-	const updateOutputOptions = (out: OutputOptions) => {
-		// Ensure that as many resources as possible are inlined.
-		out.inlineDynamicImports = true
-	}
-
-	if (Array.isArray(config.build.rollupOptions.output)) {
-		for (const o of config.build.rollupOptions.output) updateOutputOptions(o as OutputOptions)
-	} else {
-		updateOutputOptions(config.build.rollupOptions.output as OutputOptions)
-	}
-}
