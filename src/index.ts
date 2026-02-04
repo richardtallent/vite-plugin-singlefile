@@ -24,9 +24,14 @@ export type Config = {
 	// object here. For example, use `{ base: "/" }` to override the default "./" base path for
 	// non-inlined public files.
 	overrideConfig?: Partial<UserConfig>
+	// Inline web worker scripts as Blob URLs. When enabled, worker files are embedded directly
+	// into the JavaScript code that creates them, using Blob URLs instead of separate files.
+	//
+	// @default true
+	inlineWorkers?: boolean
 }
 
-const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false, deleteInlinedFiles: true }
+const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false, deleteInlinedFiles: true, inlineWorkers: true }
 
 export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
 	const f = scriptFilename.replaceAll(".", "\\.")
@@ -45,9 +50,43 @@ export function replaceCss(html: string, scriptFilename: string, scriptCode: str
 	return inlined
 }
 
+// Replaces worker file URLs in JavaScript code with inline Blob URLs.
+// This handles patterns like:
+//   - new URL("./worker.js", import.meta.url)
+//   - new URL(""+new URL("worker.js",import.meta.url).href,import.meta.url) (Vite's transformed pattern)
+// and transforms them to: URL.createObjectURL(new Blob([...], {type: "application/javascript"}))
+// Also removes {type: "module"} from Worker constructor since Blob URLs don't work with module workers.
+export function replaceWorker(jsCode: string, workerFilename: string, workerCode: string): string {
+	const escapedFilename = workerFilename.replaceAll(".", "\\.").replaceAll("/", "\\/")
+	const escapedWorkerCode = workerCode.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")
+	const blobUrlCode = `URL.createObjectURL(new Blob(["${escapedWorkerCode}"],{type:"application/javascript"}))`
+	let result = jsCode
+
+	// Pattern 1: Vite's complex pattern - new URL(""+new URL("worker.js",import.meta.url).href,import.meta.url)
+	const reViteWorkerUrl = new RegExp(
+		`new\\s+URL\\s*\\(\\s*["']\\s*["']\\s*\\+\\s*new\\s+URL\\s*\\(\\s*["'](?:\\.\\/|\\/)?(${escapedFilename})["']\\s*,\\s*import\\.meta\\.url\\s*\\)\\.href\\s*,\\s*import\\.meta\\.url\\s*\\)`,
+		"g"
+	)
+	result = result.replace(reViteWorkerUrl, blobUrlCode)
+
+	// Pattern 2: Simple pattern - new URL("./worker.js", import.meta.url)
+	const reSimpleWorkerUrl = new RegExp(`new\\s+URL\\s*\\(\\s*["'](?:\\.\\/|\\/)?(${escapedFilename})["']\\s*,\\s*import\\.meta\\.url\\s*\\)`, "g")
+	result = result.replace(reSimpleWorkerUrl, blobUrlCode)
+
+	// Remove {type:"module"} or {type: "module"} from Worker constructors that use Blob URL
+	// Vite bundles workers as IIFEs, so they don't need to be modules
+	result = result.replace(
+		/new\s+Worker\s*\(\s*(URL\.createObjectURL\(new\s+Blob\(\[[^\]]+\],\{type:"application\/javascript"\}\)\))\s*,\s*\{\s*type\s*:\s*["']module["']\s*\}\s*\)/g,
+		"new Worker($1)"
+	)
+
+	return result
+}
+
 const isJsFile = /\.[mc]?js$/
 const isCssFile = /\.css$/
 const isHtmlFile = /\.html?$/
+const isWorkerFile = /[-.]worker[-.][\w-]*\.[mc]?js$/
 
 export function viteSingleFile({
 	useRecommendedBuildConfig = true,
@@ -55,6 +94,7 @@ export function viteSingleFile({
 	inlinePattern = [],
 	deleteInlinedFiles = true,
 	overrideConfig = {},
+	inlineWorkers = true,
 }: Config = defaultConfig): PluginOption {
 	// Modifies the Vite build config to make this plugin work well.
 	const _useRecommendedBuildConfig = (config: UserConfig) => {
@@ -100,6 +140,7 @@ export function viteSingleFile({
 				html: [] as string[],
 				css: [] as string[],
 				js: [] as string[],
+				worker: [] as string[],
 				other: [] as string[],
 			}
 			for (const i of Object.keys(bundle)) {
@@ -107,6 +148,8 @@ export function viteSingleFile({
 					files.html.push(i)
 				} else if (isCssFile.test(i)) {
 					files.css.push(i)
+				} else if (isWorkerFile.test(i)) {
+					files.worker.push(i)
 				} else if (isJsFile.test(i)) {
 					files.js.push(i)
 				} else {
@@ -114,6 +157,33 @@ export function viteSingleFile({
 				}
 			}
 			const bundlesToDelete = [] as string[]
+
+			if (inlineWorkers) {
+				for (const workerFilename of files.worker) {
+					if (inlinePattern.length && !micromatch.isMatch(workerFilename, inlinePattern)) {
+						warnNotInlined(workerFilename)
+						continue
+					}
+					const workerChunk = bundle[workerFilename]
+					const workerCode = workerChunk.type === "chunk" ? workerChunk.code : ((workerChunk as OutputAsset).source as string)
+					if (workerCode != null) {
+						for (const jsFilename of files.js) {
+							const jsChunk = bundle[jsFilename] as OutputChunk
+							if (jsChunk.code != null) {
+								const updatedCode = replaceWorker(jsChunk.code, workerChunk.fileName, workerCode)
+								if (updatedCode !== jsChunk.code) {
+									this.info(`Inlining worker: ${workerFilename} into ${jsFilename}`)
+									jsChunk.code = updatedCode
+									if (!bundlesToDelete.includes(workerFilename)) {
+										bundlesToDelete.push(workerFilename)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
 			for (const name of files.html) {
 				const htmlChunk = bundle[name] as OutputAsset
 				let replacedHtml = htmlChunk.source as string
