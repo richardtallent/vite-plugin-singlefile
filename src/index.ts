@@ -72,18 +72,34 @@ export function viteSingleFile({
 		// Then the embedded resources can be loaded by relative path.
 		config.build.assetsDir = ""
 
-		if (!config.build.rollupOptions) config.build.rollupOptions = {}
-		if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
-
-		const updateOutputOptions = (out: OutputOptions) => {
-			// Ensure that as many resources as possible are inlined.
-			out.inlineDynamicImports = true
-		}
-
-		if (Array.isArray(config.build.rollupOptions.output)) {
-			for (const o of config.build.rollupOptions.output) updateOutputOptions(o as OutputOptions)
+		// Vite 8 uses Rolldown and sets up a getter proxy on build.rollupOptions before calling config hooks.
+		// Detect this to use the correct option: codeSplitting:false (Rolldown) vs inlineDynamicImports:true (Rollup).
+		const isVite8 = typeof Object.getOwnPropertyDescriptor(config.build, "rollupOptions")?.get === "function"
+		if (isVite8) {
+			const build = config.build as Record<string, unknown>
+			build.rolldownOptions ??= {}
+			const rolldownOptions = build.rolldownOptions as Record<string, unknown>
+			rolldownOptions.output ??= {}
+			const out = rolldownOptions.output as Record<string, unknown>[]
+			if (Array.isArray(out)) {
+				for (const o of out) o.codeSplitting = false
+			} else {
+				;(out as Record<string, unknown>).codeSplitting = false
+			}
 		} else {
-			updateOutputOptions(config.build.rollupOptions.output as OutputOptions)
+			if (!config.build.rollupOptions) config.build.rollupOptions = {}
+			if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
+
+			const updateOutputOptions = (out: OutputOptions) => {
+				// Ensure that as many resources as possible are inlined.
+				out.inlineDynamicImports = true
+			}
+
+			if (Array.isArray(config.build.rollupOptions.output)) {
+				for (const o of config.build.rollupOptions.output) updateOutputOptions(o as OutputOptions)
+			} else {
+				updateOutputOptions(config.build.rollupOptions.output as OutputOptions)
+			}
 		}
 
 		Object.assign(config, overrideConfig)
