@@ -1,3 +1,4 @@
+// @ts-ignore
 import { UserConfig, PluginOption } from "vite"
 import { OutputChunk, OutputAsset, OutputOptions } from "rollup"
 import micromatch from "micromatch"
@@ -5,6 +6,7 @@ import micromatch from "micromatch"
 export type Config = {
 	// Modifies the Vite build config to make this plugin work well. See `_useRecommendedBuildConfig`
 	// in the plugin implementation for more details on how this works.
+
 	//
 	// @default true
 	useRecommendedBuildConfig?: boolean
@@ -93,7 +95,7 @@ export function viteSingleFile({
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
 		enforce: "post",
-		generateBundle(_, bundle) {
+		generateBundle(_options: any, bundle: any) {
 			const warnNotInlined = (filename: string) => this.info(`NOTE: asset not inlined: ${filename}`)
 			this.info("\n")
 			const files = {

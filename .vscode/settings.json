@@ -1,0 +1,6 @@
+{
+	"chat.tools.terminal.autoApprove": {
+		"npm i": true,
+		"npx tsc": true
+	}
+}
