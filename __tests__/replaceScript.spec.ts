@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest"
-import { replaceScript } from "../dist/esm/index.js"
+import { replaceScript } from "../src/index"
 
 describe("Replace Script", () => {
 	test("It should inline external scripts and preserve other script attributes", () => {

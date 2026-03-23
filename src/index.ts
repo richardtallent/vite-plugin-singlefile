@@ -1,6 +1,6 @@
-// @ts-ignore
-import { UserConfig, PluginOption } from "vite"
-import { OutputChunk, OutputAsset, OutputOptions } from "rollup"
+// @ts-expect-error Vite's type entry is ESM-only under the current TS moduleResolution setting.
+import type { UserConfig, PluginOption } from "vite"
+import type { OutputChunk, OutputAsset, OutputBundle } from "rollup"
 import micromatch from "micromatch"
 
 export type Config = {
@@ -51,6 +51,33 @@ const isJsFile = /\.[mc]?js$/
 const isCssFile = /\.css$/
 const isHtmlFile = /\.html?$/
 
+type InlineableOutputOptions = {
+	inlineDynamicImports?: boolean
+	codeSplitting?: boolean
+}
+
+type InlineableBuildOptions = NonNullable<UserConfig["build"]> & {
+	rolldownOptions?: {
+		output?: InlineableOutputOptions | InlineableOutputOptions[]
+	}
+}
+
+const _isVite8Config = (build: InlineableBuildOptions) => typeof Object.getOwnPropertyDescriptor(build, "rollupOptions")?.get === "function"
+
+const _setOutputOption = (
+	output: InlineableOutputOptions | InlineableOutputOptions[] | undefined,
+	key: keyof InlineableOutputOptions,
+	value: boolean
+) => {
+	if (Array.isArray(output)) {
+		for (const item of output) item[key] = value
+		return output
+	}
+	const nextOutput = output ?? {}
+	nextOutput[key] = value
+	return nextOutput
+}
+
 export function viteSingleFile({
 	useRecommendedBuildConfig = true,
 	removeViteModuleLoader = false,
@@ -61,31 +88,32 @@ export function viteSingleFile({
 	// Modifies the Vite build config to make this plugin work well.
 	const _useRecommendedBuildConfig = (config: UserConfig) => {
 		if (!config.build) config.build = {}
+		const build = config.build as InlineableBuildOptions
 		// Ensures that even very large assets are inlined in your JavaScript.
-		config.build.assetsInlineLimit = () => true
+		build.assetsInlineLimit = () => true
 		// Avoid warnings about large chunks.
-		config.build.chunkSizeWarningLimit = 100000000
+		build.chunkSizeWarningLimit = 100000000
 		// Emit all CSS as a single file, which `vite-plugin-singlefile` can then inline.
-		config.build.cssCodeSplit = false
+		build.cssCodeSplit = false
 		// We need relative path to support any static files in public folder,
 		// which are copied to ${build.outDir} by vite.
 		config.base = "./"
 		// Make generated files in ${build.outDir}'s root, instead of default ${build.outDir}/assets.
 		// Then the embedded resources can be loaded by relative path.
-		config.build.assetsDir = ""
+		build.assetsDir = ""
 
-		if (!config.build.rollupOptions) config.build.rollupOptions = {}
-		if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
-
-		const updateOutputOptions = (out: OutputOptions) => {
-			// Ensure that as many resources as possible are inlined.
-			out.inlineDynamicImports = true
-		}
-
-		if (Array.isArray(config.build.rollupOptions.output)) {
-			for (const o of config.build.rollupOptions.output) updateOutputOptions(o as OutputOptions)
+		// Vite 8 exposes `build.rollupOptions` as a deprecated alias backed by a getter
+		// and expects `build.rolldownOptions.output.codeSplitting = false` instead.
+		if (_isVite8Config(build)) {
+			build.rolldownOptions ??= {}
+			build.rolldownOptions.output = _setOutputOption(build.rolldownOptions.output, "codeSplitting", false)
 		} else {
-			updateOutputOptions(config.build.rollupOptions.output as OutputOptions)
+			build.rollupOptions ??= {}
+			build.rollupOptions.output = _setOutputOption(
+				build.rollupOptions.output as InlineableOutputOptions | InlineableOutputOptions[] | undefined,
+				"inlineDynamicImports",
+				true
+			)
 		}
 
 		Object.assign(config, overrideConfig)
@@ -95,7 +123,7 @@ export function viteSingleFile({
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
 		enforce: "post",
-		generateBundle(_options: any, bundle: any) {
+		generateBundle(_options: unknown, bundle: OutputBundle) {
 			const warnNotInlined = (filename: string) => this.info(`NOTE: asset not inlined: ${filename}`)
 			this.info("\n")
 			const files = {
