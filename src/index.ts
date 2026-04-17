@@ -1,6 +1,5 @@
-// @ts-ignore
-import { UserConfig, PluginOption } from "vite"
-import { OutputChunk, OutputAsset, OutputOptions } from "rollup"
+import { UserConfig, PluginOption, version as viteVersion } from "vite"
+import type { OutputChunk, OutputAsset, OutputOptions } from "rollup"
 import micromatch from "micromatch"
 
 export type Config = {
@@ -77,9 +76,15 @@ export function viteSingleFile({
 		if (!config.build.rollupOptions) config.build.rollupOptions = {}
 		if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
 
+		const viteMajor = parseInt(viteVersion.split(".")[0], 10)
 		const updateOutputOptions = (out: OutputOptions) => {
 			// Ensure that as many resources as possible are inlined.
-			out.inlineDynamicImports = true
+			// Vite 8+ (Rolldown) uses codeSplitting:false; earlier versions use inlineDynamicImports:true
+			if (viteMajor >= 8) {
+				;(out as OutputOptions & { codeSplitting: boolean }).codeSplitting = false
+			} else {
+				out.inlineDynamicImports = true
+			}
 		}
 
 		if (Array.isArray(config.build.rollupOptions.output)) {
@@ -95,7 +100,7 @@ export function viteSingleFile({
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
 		enforce: "post",
-		generateBundle(_options: any, bundle: any) {
+		generateBundle(_options: unknown, bundle: Record<string, unknown>) {
 			const warnNotInlined = (filename: string) => this.info(`NOTE: asset not inlined: ${filename}`)
 			this.info("\n")
 			const files = {

@@ -1,15 +1,14 @@
 {
 	"compilerOptions": {
+		"moduleResolution": "bundler",
 		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
-		"baseUrl": "src",
 		"declaration": true,
 		"declarationMap": false,
 		"esModuleInterop": true,
 		"inlineSourceMap": false,
 		"lib": ["es2021", "dom"],
 		"listEmittedFiles": false,
-		"moduleResolution": "node",
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"outDir": "dist",
