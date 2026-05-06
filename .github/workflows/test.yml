@@ -11,7 +11,8 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        node: [14, 16, 18]
+        node: [22]
+        vite: ["5.4.11", "6.0.0", "7.0.0", "8.0.0"]
     steps:
       - uses: actions/checkout@v3
       - name: Setup Node.JS ${{ matrix.node }}
@@ -19,11 +20,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: "npm"
-      - name: Update NPM to >7
-        if: ${{ matrix.node }} == '14'
-        # old version of npms don't automatically install peerDependencies
-        run: npm install -g npm@9
       - run: npm ci # throws an error if package-lock.json is out-of-date
+      - name: Install Vite ${{ matrix.vite }}
+        run: npm install vite@${{ matrix.vite }} --no-save --legacy-peer-deps
       - run: npm run lint
       - run: npm test
   test-example-project:
@@ -32,7 +31,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        node: [14, 16, 18]
+        node: [18, 20]
     steps:
       - uses: actions/checkout@v3
         with:

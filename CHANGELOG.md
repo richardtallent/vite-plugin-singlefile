@@ -67,3 +67,6 @@
 |            |               | Respect Vite base option (#103)                                                                |
 | 2025-07-01 | 2.2.1         | Allow for Vite 7, bump other dependencies.                                                     |
 | 2025-07-01 | 2.3.0         | Add config option `overrideConfig` to override recommended configuration (#109)                |
+| 2026-03-15 | 2.3.1         | Add support for Vite 8                                                                         |
+| 2026-03-15 | 2.3.2         | Add backward compatibility test for Vite 5, 6, 7                                               |
+| 2026-04-17 | 2.3.3         | Fix some minor TS / Vite 8 issues; Like #119 but fewer changes                                 |
