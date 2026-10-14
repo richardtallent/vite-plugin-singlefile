@@ -46,7 +46,7 @@
 	},
 	"homepage": "https://github.com/richardtallent/vite-plugin-singlefile/tree/main/#readme",
 	"dependencies": {
-		"micromatch": "^4.0.8"
+		"picomatch": "^4.0.7"
 	},
 	"peerDependencies": {
 		"rollup": "^4.59.0",
@@ -61,13 +61,14 @@
 		"@eslint/eslintrc": "^3.3.5",
 		"@eslint/js": "^9.39.4",
 		"@types/jest": "^30.0.0",
-		"@types/micromatch": "^4.0.10",
 		"@types/node": "latest",
+		"@types/picomatch": "^4.0.3",
 		"@typescript-eslint/eslint-plugin": "^8.58.2",
 		"@typescript-eslint/parser": "^8.58.2",
 		"eslint": "^9.39.4",
 		"globale": "^1.0.0",
 		"rimraf": "^6.1.3",
+		"rollup": "^4.59.0",
 		"typescript": "^6.0.3",
 		"vitest": "^4.1.4"
 	},
