@@ -39,6 +39,8 @@ _I've only tested some of the above in Chromium-based browsers. YMMV for WebKit 
 - Worklets (theoretically could work, but not currently supported)
 - Sourcemaps (useless, since inlining happens after they are generated)
 
+If your app still ends up with non-inlined chunks (_e.g._, from dynamic `import()` or lazy-loaded routes) that fail under `file://`, a different plugin may be a better fit. See [issue #121](https://github.com/richardtallent/vite-plugin-singlefile/issues/121).
+
 ## Installation
 
 ```shell
