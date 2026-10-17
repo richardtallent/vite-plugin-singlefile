@@ -70,3 +70,5 @@
 | 2026-03-15 | 2.3.1         | Add support for Vite 8                                                                         |
 | 2026-03-15 | 2.3.2         | Add backward compatibility test for Vite 5, 6, 7                                               |
 | 2026-04-17 | 2.3.3         | Fix some minor TS / Vite 8 issues; Like #119 but fewer changes                                 |
+| 2026-10-17 | 2.3.4         | Replace `micromatch` with `picomatch` to drop vulnerable `braces` dependency (#125, #126, thanks @baseballyama!) |
+|            |               | Add `inlinePattern` tests                                                                      |
