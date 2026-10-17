@@ -52,6 +52,37 @@ export function replaceCss(html: string, scriptFilename: string, scriptCode: str
 	return inlined
 }
 
+// Inlining turns external files into inline code, which a Content-Security-Policy meta tag may block. This returns
+// a message for each kind of inline code ("script" or "style") that a CSP meta in the HTML would block. Only
+// `<meta>` policies are visible to the plugin; policies sent as HTTP headers are not checked.
+export function findCspProblems(html: string, inlinedScript: boolean, inlinedStyle: boolean): string[] {
+	const problems = [] as string[]
+	const metas = html.match(/<meta\b[^>]*>/gi) ?? []
+	for (const meta of metas) {
+		if (!/http-equiv\s*=\s*["']?content-security-policy["']?(?=[\s/>])/i.test(meta)) continue
+		const content = /\bcontent\s*=\s*(?:"([^"]*)"|'([^']*)')/i.exec(meta)
+		if (!content) continue
+		const directives = new Map<string, string[]>()
+		for (const part of (content[1] ?? content[2]).split(";")) {
+			const [name, ...sources] = part.trim().split(/\s+/)
+			if (name && !directives.has(name.toLowerCase())) directives.set(name.toLowerCase(), sources)
+		}
+		const blocks = (names: string[]) => {
+			const sources = names.map((n) => directives.get(n)).find((v) => v !== undefined)
+			if (!sources) return false
+			// A hash or nonce makes browsers ignore 'unsafe-inline'; we can't verify they match, so assume the author did.
+			return !sources.some((v) => /^'(unsafe-inline|nonce-.+|sha(256|384|512)-.+)'$/i.test(v))
+		}
+		if (inlinedScript && blocks(["script-src-elem", "script-src", "default-src"])) problems.push("script")
+		if (inlinedStyle && blocks(["style-src-elem", "style-src", "default-src"])) problems.push("style")
+	}
+	return [...new Set(problems)].map(
+		(kind) =>
+			`The Content-Security-Policy meta tag does not allow inline ${kind === "script" ? "<script>" : "<style>"} code, which is now inlined in the HTML. ` +
+			`Add 'unsafe-inline', or a 'sha256-...' hash or nonce, to ${kind === "script" ? "script-src" : "style-src"}.`
+	)
+}
+
 const isJsFile = /\.[mc]?js$/
 const isCssFile = /\.css$/
 const isHtmlFile = /\.html?$/
@@ -130,6 +161,8 @@ export function viteSingleFile({
 			for (const name of files.html) {
 				const htmlChunk = bundle[name] as OutputAsset
 				let replacedHtml = htmlChunk.source as string
+				let inlinedScript = false
+				let inlinedStyle = false
 				for (const filename of files.js) {
 					if (inlinePattern.length && !picomatch.isMatch(filename, inlinePattern)) {
 						warnNotInlined(filename)
@@ -139,7 +172,9 @@ export function viteSingleFile({
 					if (jsChunk.code != null) {
 						this.info(`Inlining: ${filename}`)
 						bundlesToDelete.push(filename)
+						const before = replacedHtml
 						replacedHtml = replaceScript(replacedHtml, jsChunk.fileName, jsChunk.code, removeViteModuleLoader)
+						inlinedScript ||= replacedHtml !== before
 					}
 				}
 				for (const filename of files.css) {
@@ -150,7 +185,12 @@ export function viteSingleFile({
 					const cssChunk = bundle[filename] as OutputAsset
 					this.info(`Inlining: ${filename}`)
 					bundlesToDelete.push(filename)
+					const before = replacedHtml
 					replacedHtml = replaceCss(replacedHtml, cssChunk.fileName, cssChunk.source as string)
+					inlinedStyle ||= replacedHtml !== before
+				}
+				for (const problem of findCspProblems(replacedHtml, inlinedScript, inlinedStyle)) {
+					this.warn(`${name}: ${problem}`)
 				}
 				htmlChunk.source = replacedHtml
 			}

@@ -114,6 +114,7 @@ The recommended configuration really is recommended, but if you need to tweak so
 
 - Static resources in `public` folder (like `favicon`) are not inlined by Vite, and this plugin doesn't do that either. BUT the output single HTML file CAN work together with these resouces, using relative paths.
 - Inlining of SVG isn't supported directly by Vite, so it isn't supported directly here either. You'll need to use something like `https://github.com/jpkleemans/vite-svg-loader`, or put your SVG directly into the template.
+- Inlining changes what a Content-Security-Policy has to allow. If your HTML has a CSP `<meta>` tag whose `script-src`/`style-src` (or `default-src` fallback) lacks `'unsafe-inline'`, a hash, or a nonce, the inlined code will be blocked by the browser, and the plugin will warn at build time. CSPs sent as HTTP headers can't be detected.
 - There may be other situations where referenced files aren't inlined by Vite and aren't caught by this plugin either.
 - This is my first Vite and first Rollup plugin. I have no idea what I'm doing. PRs welcome.
 - This plugin uses dual packages to support both ESM and CommonJS users. This _should_ work automatically. Details:
