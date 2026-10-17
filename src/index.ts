@@ -1,5 +1,5 @@
 import { UserConfig, PluginOption, version as viteVersion } from "vite"
-import type { OutputChunk, OutputAsset, OutputOptions } from "rollup"
+import type { OutputChunk, OutputAsset } from "rollup"
 import picomatch from "picomatch"
 
 export type Config = {
@@ -32,6 +32,7 @@ export type Config = {
 	overrideConfig?: Partial<UserConfig>
 }
 
+const viteMajor = parseInt(viteVersion.split(".")[0], 10)
 const defaultConfig = { useRecommendedBuildConfig: true, removeViteModuleLoader: false, deleteInlinedFiles: true }
 
 export function replaceScript(html: string, scriptFilename: string, scriptCode: string, removeViteModuleLoader = false): string {
@@ -79,33 +80,32 @@ export function viteSingleFile({
 		// Then the embedded resources can be loaded by relative path.
 		config.build.assetsDir = ""
 
-		if (!config.build.rollupOptions) config.build.rollupOptions = {}
-		if (!config.build.rollupOptions.output) config.build.rollupOptions.output = {}
-
-		const viteMajor = parseInt(viteVersion.split(".")[0], 10)
-		const updateOutputOptions = (out: OutputOptions) => {
-			// Ensure that as many resources as possible are inlined.
-			// Vite 8+ (Rolldown) uses codeSplitting:false; earlier versions use inlineDynamicImports:true
-			if (viteMajor >= 8) {
-				;(out as OutputOptions & { codeSplitting: boolean }).codeSplitting = false
-			} else {
-				out.inlineDynamicImports = true
-			}
-		}
-
-		if (Array.isArray(config.build.rollupOptions.output)) {
-			for (const o of config.build.rollupOptions.output) updateOutputOptions(o as OutputOptions)
-		} else {
-			updateOutputOptions(config.build.rollupOptions.output as OutputOptions)
-		}
-
 		Object.assign(config, overrideConfig)
 	}
+
+	let singleInput = true
 
 	return {
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
 		enforce: "post",
+		// Disabling code splitting is only valid for single-input builds. Multi-input builds (such as the
+		// SSR and client builds of SvelteKit) are left alone, since Rollup/Rolldown reject the option (#122).
+		options: useRecommendedBuildConfig
+			? (opts: { input?: string | string[] | Record<string, string> }) => {
+					const input = opts.input
+					singleInput = !input || typeof input === "string" || (Array.isArray(input) ? input.length <= 1 : Object.keys(input).length <= 1)
+					return null
+				}
+			: undefined,
+		outputOptions: useRecommendedBuildConfig
+			? (out: object) => {
+					if (!singleInput) return null
+					// Ensure that as many resources as possible are inlined.
+					// Vite 8+ (Rolldown) uses codeSplitting:false; earlier versions use inlineDynamicImports:true
+					return (viteMajor >= 8 ? { ...out, codeSplitting: false } : { ...out, inlineDynamicImports: true }) as never
+				}
+			: undefined,
 		generateBundle: { order: "post", handler(_options: unknown, bundle: Record<string, unknown>) {
 			const warnNotInlined = (filename: string) => this.info(`NOTE: asset not inlined: ${filename}`)
 			this.info("\n")

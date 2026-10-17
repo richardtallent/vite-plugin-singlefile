@@ -65,6 +65,16 @@ describe("viteSingleFile build integration", () => {
 		expect(html).not.toMatch(/<script[^>]+src=/)
 	})
 
+	// Multi-input builds (e.g. SvelteKit's SSR/client builds) reject code splitting being disabled (#122).
+	test("it does not disable code splitting for multi-input builds", () => {
+		const root = createFixtureApp(
+			"\tbuild: { lib: false, rollupOptions: { input: { a: 'src/main.js', b: 'src/lazy.js' } } },\n"
+		)
+		const result = spawnSync("node", [viteBin, "build"], { cwd: root, encoding: "utf8" })
+		expect(`${result.stdout}${result.stderr}`).not.toContain("multiple inputs are not supported")
+		expect(result.status).toBe(0)
+	})
+
 	// `build.license` was added in Vite 8; the license plugin reads chunk.moduleIds in generateBundle, so
 	// this plugin must not delete the inlined chunks before it runs.
 	test.runIf(Number(viteVersion.split(".")[0]) >= 8)("it preserves dependency licenses when build.license is enabled", () => {

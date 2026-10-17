@@ -74,3 +74,4 @@
 |            |               | Add `inlinePattern` tests                                                                      |
 |            |               | Fix `build.license` output being empty by running `generateBundle` after Vite's license plugin (#113, thanks @jendrikw!) |
 |            |               | Add `outputFileName` option to rename the output HTML file (#123)                              |
+|            |               | Only disable code splitting for single-input builds, fixing multi-input builds such as SvelteKit (#122) |
