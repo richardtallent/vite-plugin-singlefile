@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest"
-import { replaceCss } from "../dist/esm/index.js"
+import { replaceCss } from "../src/index"
 
 describe("Replace Css", () => {
 	test("It should inline external css and preserve other script attributes", () => {
