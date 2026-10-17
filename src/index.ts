@@ -100,7 +100,7 @@ export function viteSingleFile({
 		name: "vite:singlefile",
 		config: useRecommendedBuildConfig ? _useRecommendedBuildConfig : undefined,
 		enforce: "post",
-		generateBundle(_options: unknown, bundle: Record<string, unknown>) {
+		generateBundle: { order: "post", handler(_options: unknown, bundle: Record<string, unknown>) {
 			const warnNotInlined = (filename: string) => this.info(`NOTE: asset not inlined: ${filename}`)
 			this.info("\n")
 			const files = {
@@ -156,7 +156,7 @@ export function viteSingleFile({
 			for (const name of files.other) {
 				warnNotInlined(name)
 			}
-		},
+		} },
 	}
 }
 

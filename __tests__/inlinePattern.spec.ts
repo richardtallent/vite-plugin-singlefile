@@ -14,7 +14,7 @@ const inlined = (inlinePattern: string[]) => {
 		bundle[n] = n.endsWith(".css") ? { fileName: n, source: "x{}" } : { fileName: n, code: "x()" }
 	}
 	const plugin = viteSingleFile({ inlinePattern, useRecommendedBuildConfig: false }) as any
-	plugin.generateBundle.call({ info: () => {} }, {}, bundle)
+	plugin.generateBundle.handler.call({ info: () => {} }, {}, bundle)
 	return names.filter((n) => !(n in bundle)).sort()
 }
 

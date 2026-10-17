@@ -72,3 +72,4 @@
 | 2026-04-17 | 2.3.3         | Fix some minor TS / Vite 8 issues; Like #119 but fewer changes                                 |
 | 2026-10-17 | 2.3.4         | Replace `micromatch` with `picomatch` to drop vulnerable `braces` dependency (#125, #126, thanks @baseballyama!) |
 |            |               | Add `inlinePattern` tests                                                                      |
+|            |               | Fix `build.license` output being empty by running `generateBundle` after Vite's license plugin (#113, thanks @jendrikw!) |
