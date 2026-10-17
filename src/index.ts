@@ -21,6 +21,11 @@ export type Config = {
 	//
 	// @default true
 	deleteInlinedFiles?: boolean
+	// Optionally, rename the output HTML file (e.g. "app.html" instead of "index.html"). Only applied
+	// when the build emits exactly one HTML file.
+	//
+	// @default undefined
+	outputFileName?: string
 	// If you need to override anything specific in the recommended build config, pass a sparse
 	// object here. For example, use `{ base: "/" }` to override the default "./" base path for
 	// non-inlined public files.
@@ -55,6 +60,7 @@ export function viteSingleFile({
 	removeViteModuleLoader = false,
 	inlinePattern = [],
 	deleteInlinedFiles = true,
+	outputFileName,
 	overrideConfig = {},
 }: Config = defaultConfig): PluginOption {
 	// Modifies the Vite build config to make this plugin work well.
@@ -151,6 +157,16 @@ export function viteSingleFile({
 			if (deleteInlinedFiles) {
 				for (const name of bundlesToDelete) {
 					delete bundle[name]
+				}
+			}
+			if (outputFileName) {
+				if (files.html.length === 1 && files.html[0] !== outputFileName) {
+					const htmlChunk = bundle[files.html[0]] as OutputAsset
+					delete bundle[files.html[0]]
+					// Assigning new keys on `bundle` isn't supported by Rolldown, so emit a new asset instead.
+					this.emitFile({ type: "asset", fileName: outputFileName, source: htmlChunk.source })
+				} else if (files.html.length !== 1) {
+					this.warn(`outputFileName ignored: expected exactly one HTML file, found ${files.html.length}`)
 				}
 			}
 			for (const name of files.other) {

@@ -73,3 +73,4 @@
 | 2026-10-17 | 2.3.4         | Replace `micromatch` with `picomatch` to drop vulnerable `braces` dependency (#125, #126, thanks @baseballyama!) |
 |            |               | Add `inlinePattern` tests                                                                      |
 |            |               | Fix `build.license` output being empty by running `generateBundle` after Vite's license plugin (#113, thanks @jendrikw!) |
+|            |               | Add `outputFileName` option to rename the output HTML file (#123)                              |

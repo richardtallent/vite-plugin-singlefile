@@ -9,7 +9,7 @@ const fixtureRoot = join(repoRoot, "__tests__", "fixtures", "vite-app")
 const viteBin = join(repoRoot, "node_modules", "vite", "bin", "vite.js")
 const tmpRoots: string[] = []
 
-const createFixtureApp = (viteConfigOptions = "") => {
+const createFixtureApp = (viteConfigOptions = "", pluginOptions = "") => {
 	const root = mkdtempSync(join(repoRoot, ".tmp-vite-build-"))
 	tmpRoots.push(root)
 	cpSync(fixtureRoot, root, { recursive: true })
@@ -19,7 +19,7 @@ const createFixtureApp = (viteConfigOptions = "") => {
 import { viteSingleFile } from "../src/index.ts"
 
 export default defineConfig({
-	plugins: [viteSingleFile()],
+	plugins: [viteSingleFile(${pluginOptions})],
 ${viteConfigOptions}})
 `
 	)
@@ -53,6 +53,16 @@ describe("viteSingleFile build integration", () => {
 		expect(html).toContain("lazy-loaded")
 		expect(html).not.toMatch(/<script[^>]+src=/)
 		expect(html).not.toMatch(/<link[^>]+href=.*\\.css/)
+	})
+
+	test("it renames the output HTML file when outputFileName is set", () => {
+		const root = createFixtureApp("", `{ outputFileName: "app.html" }`)
+		const result = spawnSync("node", [viteBin, "build"], { cwd: root, encoding: "utf8" })
+		expect(result.status).toBe(0)
+		expect(readdirSync(join(root, "dist")).sort()).toEqual(["app.html"])
+		const html = readFileSync(join(root, "dist", "app.html"), "utf8")
+		expect(html).toContain("lazy-loaded")
+		expect(html).not.toMatch(/<script[^>]+src=/)
 	})
 
 	// `build.license` was added in Vite 8; the license plugin reads chunk.moduleIds in generateBundle, so
