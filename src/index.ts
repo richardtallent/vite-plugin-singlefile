@@ -1,6 +1,6 @@
 import { UserConfig, PluginOption, version as viteVersion } from "vite"
 import type { OutputChunk, OutputAsset, OutputOptions } from "rollup"
-import micromatch from "micromatch"
+import picomatch from "picomatch"
 
 export type Config = {
 	// Modifies the Vite build config to make this plugin work well. See `_useRecommendedBuildConfig`
@@ -125,7 +125,7 @@ export function viteSingleFile({
 				const htmlChunk = bundle[name] as OutputAsset
 				let replacedHtml = htmlChunk.source as string
 				for (const filename of files.js) {
-					if (inlinePattern.length && !micromatch.isMatch(filename, inlinePattern)) {
+					if (inlinePattern.length && !picomatch.isMatch(filename, inlinePattern)) {
 						warnNotInlined(filename)
 						continue
 					}
@@ -137,7 +137,7 @@ export function viteSingleFile({
 					}
 				}
 				for (const filename of files.css) {
-					if (inlinePattern.length && !micromatch.isMatch(filename, inlinePattern)) {
+					if (inlinePattern.length && !picomatch.isMatch(filename, inlinePattern)) {
 						warnNotInlined(filename)
 						continue
 					}
